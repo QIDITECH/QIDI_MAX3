@@ -27,11 +27,11 @@ QIDI provides a packaged version file in the version bar next to it. Please down
 ```shell
 cd /root
 rm -rf xindi
-git clone https://github.com/QIDITECH/QIDI_SMART3.git
+git clone https://github.com/QIDITECH/QIDI_MAX3.git
 ```
 4. Code cloning may take some time, please be patient. If there are certificate issues, please confirm if the system time is correct. After the code cloning is completed, enter the following code block
 ```shell
-mv QIDI_SMART3 xindi
+mv QIDI_MAX3 xindi
 cd /root/xindi/build
 cmake ..
 make
