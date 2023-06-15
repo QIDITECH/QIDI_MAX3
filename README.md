@@ -2,9 +2,9 @@
 <p align="center"><a href="/LICENSE"><img alt="GPL-V3.0 License" src="other/qidi.svg"></a></p>
 
 # Document Instructions
-QIDISmart3 is a server-side software that interacts with the screen in the smart3 model system. This document contains our source code, and we provide two ways to update it: one is to download the packaged file to a USB drive and insert it into the machine for updating, and the other is to compile and update it through source code.  
+QIDI_Max3 is a server-side software that interacts with the screen in the smart3 model system. This document contains our source code, and we provide two ways to update it: one is to download the packaged file to a USB drive and insert it into the machine for updating, and the other is to compile and update it through source code.  
 ***Please note that manual updates may affect normal after-sales service, so it is best to automatically update through the machine with packaged files.***  
-QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with SMART.
+QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.
 
 ## Detailed update process
 #### Packaged files
