@@ -13,7 +13,7 @@ QIDI provides a packaged version file in the version bar next to it. Please down
 <p align="left"><img src="other/blankname.png" height="360" alt="sample"></p>
 
 2. Select the latest version in the version release bar next to it, download the compressed file package starting with SMART and extract it locally.  
-<a href="/QIDITECH/QIDI_MAX3/releases/download/Max3_V4.3.1/MAX3_V4.3.1.rar" >Download link </a>
+<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/download/Max3_V4.3.1/MAX3_V4.3.0.rar">Download link </a>
 3. Place the files in the USB drive, such as
 
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
