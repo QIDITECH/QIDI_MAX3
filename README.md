@@ -50,8 +50,8 @@ Thanks to the developers and maintainers of these open source projects.Please co
 
  Software |  QIDI edition
  ----|----
-**Klipper** | **[link](https://github.com/QIDITECH/klipper)**
-**Moonraker** | **[link](https://github.com/QIDITECH/moonrake)**
+**Klipper** | **[https://github.com/QIDITECH/klipper](https://github.com/QIDITECH/klipper)**
+**Moonraker** | **[https://github.com/QIDITECH/moonrake](https://github.com/QIDITECH/moonrake)**
 
 
 
