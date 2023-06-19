@@ -45,6 +45,7 @@ You can contact [After-Sales Service](https://qidi3d.com/pages/warranty-policy-a
 
 ## Others
 
+Different from the usual method of directly accessing the fluid page through an IP address, the QIDI version sets the default port number to 10088, so you need to add `:10088` after the machine's IP to access the fluid page</br>
 The 3D printers of QIDI are based on Klipper.On the basic of Klipper open source project, we have made some modifications to it's source code to meet some of the user's needs.At the same time, we have also made modifications to Moonraker, so that the screens we set can correspond to the operations on the page.
 Thanks to the developers and maintainers of these open source projects.Please consider using or supporting these powerful projects.
 
