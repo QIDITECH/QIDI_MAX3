@@ -361,11 +361,12 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         switch (widget_id)
         {
         case TJC_PAGE_OPEN_LEVELED_FINISH:
-            if (auto_level_button_enabled == true) {
+            //4.3.2 CLL 修复卡在自动调平完成页面
+            //if (auto_level_button_enabled == true) {
                 auto_level_button_enabled = false;
                 // page_to(TJC_PAGE_OPEN_SYNTONY);
                 open_go_to_syntony_move();
-            }
+            //}
             
             // std::cout << "共振补偿按下按钮" << std::endl;
             break;
@@ -399,7 +400,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         {
         case TJC_PAGE_FILAMENT_VIDEO_1_RIGHT:
             //3.1.0 CLL 防止点击过快报错
-            if (printer_idle_timeout_state == "Ready") {
+            if (printer_idle_timeout_state == "Ready" || printer_idle_timeout_state == "Idle") {
                 open_down_50();
                 page_to(TJC_PAGE_FILAMENT_VIDEO_2);
             }
@@ -1103,13 +1104,15 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         {
         case TJC_PAGE_MOVE_POP_1_YES:
             move_home();
-            set_move_dist(0.1);             // 恢复步长为0.1
             page_to(TJC_PAGE_MOVE);
+            //4.3.3 CLL 修复显示bug
+            set_move_dist(0.1);             // 恢复步长为0.1
             break;
 
         case TJC_PAGE_MOVE_POP_1_NO:
-            set_move_dist(0.1);             // 恢复步长为0.1
             page_to(TJC_PAGE_MOVE);
+            //4.3.3 CLL 修复显示bug
+            set_move_dist(0.1);             // 恢复步长为0.1
             break;
         
         default:
@@ -1451,6 +1454,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
 
         //2023.4.21-5 修改调平数据显示
         case TJC_PAGE_LEVEL_MODE_ZOFFSET:
+            get_object_status();
             page_to(TJC_PAGE_SET_ZOFFSET);
             break;
 
@@ -1643,7 +1647,8 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         switch (widget_id)
         {
         case TJC_PAGE_AUTO_FINISH_YES:
-            if (auto_level_button_enabled == true) {
+            //4.3.3 CLL 修复卡在自动调平完成页面
+            if (auto_level_button_enabled == true ||printer_idle_timeout_state == "Idle") {
                 auto_level_button_enabled = false;
                 std::cout << "自动调平已完成" << std::endl;
                 finish_auto_level();
@@ -1719,7 +1724,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
                 page_to(TJC_PAGE_PRINT_FILAMENT);
             } else if (previous_page_id == TJC_PAGE_PREVIEW) {
                 page_to(TJC_PAGE_FILAMENT);
-            } else if (previous_page_id == TJC_PAGE_PRINT_FILAMENT) {
+            } else{//4.3.3 CLL 修复断料弹窗卡住bug
                 page_to(TJC_PAGE_PRINT_FILAMENT);
             }
             break;
@@ -2254,6 +2259,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         }
         break;
 
+    //4.3.2 CLL 优化页面跳转
     case TJC_PAGE_SERVICE:
         switch (widget_id)
         {
@@ -2276,6 +2282,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
 
             
             //if (detect_disk() == 0) { //3.1.0 CLL 去除U盘插入判断
+            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
                 page_to(TJC_PAGE_FILE_LIST_1);
                 // printer_set_babystep();
                 page_files_pages = 0;
@@ -2288,6 +2295,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
                 refresh_page_files_list_1();
 
                 get_object_status();
+            }
             //} else {
             //    page_to(TJC_PAGE_DISK_DETECT_2);
             //}
@@ -2295,15 +2303,24 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             break;
         
         case TJC_PAGE_SERVICE_BTN_HOME:
-            page_to(TJC_PAGE_MAIN);
+            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
+                page_to(TJC_PAGE_MAIN);
+            }
             break;
 
         case TJC_PAGE_SERVICE_BTN_TOOL:
-            page_to(TJC_PAGE_MOVE);
+            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
+                page_to(TJC_PAGE_MOVE);
+            }
             break;
 
         case TJC_PAGE_SERVICE_LANGUAGE:
-            page_to(TJC_PAGE_LANGUAGE);
+            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
+                page_to(TJC_PAGE_LANGUAGE);
+            }
             break;
 
         case TJC_PAGE_SERVICE_RESET:
@@ -2318,7 +2335,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         }
         break;
 
-    //2023.5.9 CLL 修复重启后温度显示异常
+    //4.3.1 CLL 优化页面跳转
     case TJC_PAGE_RESET:
         switch (widget_id)
         {
@@ -2347,7 +2364,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             break;
 
         case TJC_PAGE_RESET_SERVICE:
-            //page_to(TJC_PAGE_SERVICE);
+            page_to(TJC_PAGE_SERVICE);
             break;
 
         case TJC_PAGE_RESET_ABOUT:
@@ -2438,7 +2455,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         }
         break;
 
-    //3.1.0 修复页面跳转bug
+    //4.3.2 CLL 优化页面跳转
     case TJC_PAGE_ABOUT:
         switch (widget_id)
         {
@@ -2481,26 +2498,27 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         
         case TJC_PAGE_ABOUT_BTN_HOME:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_MAIN);
             }
             break;
 
         case TJC_PAGE_ABOUT_BTN_TOOL:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_MOVE);
             }
             break;
 
         case TJC_PAGE_ABOUT_LANGUAGE:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_LANGUAGE);
             }
             break;
 
         case TJC_PAGE_ABOUT_SERVICE:
-            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
-                page_to(TJC_PAGE_SERVICE);
-            }
+            page_to(TJC_PAGE_SERVICE);
             break;
 
         case TJC_PAGE_ABOUT_RESET:
@@ -2533,7 +2551,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         }
         break;
 
-    //3.1.0 CLL 修复页面跳转bug
+    //4.3.2 CLL 优化页面跳转
     case TJC_PAGE_NO_UPDATA:
         switch (widget_id)
         {
@@ -2576,30 +2594,31 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
 
         case TJC_PAGE_NO_UPDATA_BTN_HOME:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_MAIN);
             }
             break;
 
         case TJC_PAGE_NO_UPDATA_BTN_TOOL:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_MOVE);
             }
             break;
 
         case TJC_PAGE_NO_UPDATA_LANGUAGE:
             if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
+                get_object_status();
                 page_to(TJC_PAGE_LANGUAGE);
             } 
             break;
 
         case TJC_PAGE_NO_UPDATA_SERVICE:
-            if (printer_webhooks_state != "shutdown" && printer_webhooks_state != "error") {
-                page_to(TJC_PAGE_SERVICE);
-            } 
+            page_to(TJC_PAGE_SERVICE);
             break;
 
         case TJC_PAGE_NO_UPDATA_RESET:
-                go_to_reset();
+            go_to_reset();
             break;
 
         //2023.5.9 CLL 隐藏开机引导

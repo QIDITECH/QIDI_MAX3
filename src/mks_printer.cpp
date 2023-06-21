@@ -115,9 +115,9 @@ bool manual_level_finished = false;
 
 float printer_bed_mesh_mesh_min[2] = {0.0, 0.0};
 float printer_bed_mesh_mesh_max[2] = {0.0, 0.0};
-//3.1.0 CLL 新增调平至多点为25个
+//4.3.3 CLL 新增调平至多点为64个
 //float printer_bed_mesh_profiles_mks_points[4][4] = {0.0};
-float printer_bed_mesh_profiles_mks_points[5][5] = {0.0};
+float printer_bed_mesh_profiles_mks_points[8][8] = {0.0};
 float printer_bed_mesh_profiles_mks_mesh_params_tension = 0.0;
 float printer_bed_mesh_profiles_mks_mesh_params_mesh_x_pps = 0;
 std::string printer_bed_mesh_profiles_mks_mesh_params_algo = "";
@@ -325,13 +325,13 @@ void parse_bed_mesh(nlohmann::json bed_mesh) {
                 if (bed_mesh["profiles"]["default"]["mesh_params"]["max_y"] != nlohmann::detail::value_t::null) {
                     printer_bed_mesh_profiles_mks_mesh_params_max_y = bed_mesh["profiles"]["default"]["mesh_params"]["max_y"];
                 }
-                //3.1.0 CLL 调平修改为至多25个点
+                //4.3.3 CLL 调平修改为至多64个点
                 for (int i = 0; i < printer_bed_mesh_profiles_mks_mesh_params_y_count; i++) {
-                    if (i == 5) {
+                    if (i == 8) {
                         break;
                     }
                     for (int j = 0; j < printer_bed_mesh_profiles_mks_mesh_params_x_count; j++) {
-                        if (j == 5) {
+                        if (j == 8) {
                             break;
                         }
                         printer_bed_mesh_profiles_mks_points[i][j] = bed_mesh["profiles"]["default"]["points"][i][j];
@@ -501,9 +501,9 @@ void parse_subscribe_objects_status(nlohmann::json status) {
     if (status["bed_mesh"] != nlohmann::detail::value_t::null) {
         std::cout << status["bed_mesh"] << std::endl;
         parse_bed_mesh(status["bed_mesh"]);
-        //3.1.0 CLL 修改调平点为25个
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        //4.3.3 CLL 修改调平点显示至多为64个
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
         //for (int i = 0; i < 4; i++) {
         //    for (int j = 0; j < 4; j++) {
                 std::cout << "############# Points :" << i << ", " << j << " " << printer_bed_mesh_profiles_mks_points[i][j] << std::endl;

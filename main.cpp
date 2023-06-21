@@ -152,11 +152,12 @@ int main(int argc, char** argv) {
 				
 				page_to(current_page_id);
 
+                //4.3.2 CLL 修复开机读取不到参数
 				get_total_time();
-				sleep(1);
+				sleep(2);
 				sub_object_status();									// 订阅相关的参数
 
-				sleep(1);
+				sleep(2);
 
 				get_object_status();									// 主动获取必备的参数
 				sleep(2);

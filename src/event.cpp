@@ -1104,7 +1104,6 @@ void refresh_page_stopping() {
     MKSLOG_BLUE("Printer ide_timeout state: %s", printer_idle_timeout_state.c_str());
     MKSLOG_BLUE("Printer webhooks state: %s", printer_webhooks_state.c_str());
     if (printer_idle_timeout_state == "Ready") {
-        //test
         // sleep(2);
         //3.1.2 CLL 修复网页显示预览图bug
         clear_previous_data();
@@ -1157,19 +1156,19 @@ void refresh_page_set_zoffset() {
         send_cmd_txt(tty_fd, "b20", std::to_string(page_set_zoffset_z_position[14]));
         send_cmd_txt(tty_fd, "b21", std::to_string(page_set_zoffset_z_position[15]));
         */
-    //3.1.0 CLL 修改调平为至多25个点
-    std::string temp[5][5];
+    //4.3.3 CLL 修改调平为至多64个点
+    std::string temp[8][8];
     for (int i = 0; i < printer_bed_mesh_profiles_mks_mesh_params_y_count; i++) {
-        if (i == 5) {
+        if (i == 8) {
             break;
         }
         for (int j = 0; j < printer_bed_mesh_profiles_mks_mesh_params_x_count; j++) {
-            if (j == 5) {
+            if (j == 8) {
                 break;
             }
             temp[i][j] = std::to_string(printer_bed_mesh_profiles_mks_points[i][j]);
-            temp[i][j] = temp[i][j].substr(0, temp[i][j].find(".") + 4);
-            send_cmd_txt(tty_fd,"t"+std::to_string(i * 5 + j),temp[i][j]);
+            temp[i][j] = temp[i][j].substr(0, temp[i][j].find(".") + 3);
+            send_cmd_txt(tty_fd,"t"+std::to_string(i * 8 + j),temp[i][j]);
         }
     }
     /*
@@ -2586,11 +2585,12 @@ void start_manual_level() {
 
 /* 完成自动调平 */
 void finish_auto_level() {
-    if ( auto_level_finished == false ) {
+    //4.3.3 CLL 修复自动调平完成页面卡住
+    if ( auto_level_finished == false || printer_idle_timeout_state == "Idle") {
         // ep->Send(json_run_a_gcode("G1 X0 Y0 F6000\nSAVE_CONFIG\n"));
         // ep->Send(json_run_a_gcode("G1 X0 Y0 F6000\nG91\nG1 Z200\nG90\nM1029\nSAVE_CONFIG"));
-        //2023.4.21-1 增加调平完成后移动平台
-        ep->Send(json_run_a_gcode("G0 X0 Y0 Z50 F5000\nM1029\nSAVE_CONFIG"));
+        //4.3.3 CLL 修改调平完成后平台移动
+        ep->Send(json_run_a_gcode("G0 Z50 F600\nG1 X0 Y0 G9000\nM1029\nSAVE_CONFIG"));
         // ep->Send(json_run_a_gcode("SAVE_CONFIG\nBED_MESH_PROFILE LOAD=\"name\"\n"));
         all_level_saving = false;
         // sleep(7);
@@ -3817,4 +3817,17 @@ void refresh_page_preview_pop() {
             clear_page_printing_arg();
         }
     }
+}
+
+//4.3.2 CLL 修复无法读取文件名中带空格文件
+std::string replaceCharacters(const std::string& path, const std::string& searchChars, const std::string& replacement) {
+    std::string result = path;
+    for (char c : searchChars) {
+        std::size_t found = result.find(c);
+        while (found != std::string::npos) {
+            result.replace(found, 1, replacement);
+            found = result.find(c, found + replacement.length());
+        }
+    }
+    return result;
 }
