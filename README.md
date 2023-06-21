@@ -4,7 +4,8 @@
 # Document Instructions
 QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide two ways to update it: one is to download the packaged file to a USB drive and insert it into the machine for updating, and the other is to compile and update it through source code.  
 ***Please note that manual updates may affect normal after-sales service, so it is best to automatically update through the machine with packaged files.***  
-QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.
+QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.  
+We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.
 
 ## Detailed update process
 #### Packaged files
