@@ -2,9 +2,9 @@
 <p align="center"><a href="/LICENSE"><img alt="GPL-V3.0 License" src="other/qidi.svg"></a></p>
 
 # Document Instructions
-QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide two ways to update it: one is to download the packaged file to a USB drive and insert it into the machine for updating, and the other is to compile and update it through source code.  
-***Please note that manual updates may affect normal after-sales service, so it is best to automatically update through the machine with packaged files.***  
-QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.
+QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide the safer solution to update it:Download the packaged file to a USB drive and insert it into the machine for updating.  
+QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.  
+We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.
 
 ## Detailed update process
 #### Packaged files
@@ -13,7 +13,7 @@ QIDI provides a packaged version file in the version bar next to it. Please down
 <p align="left"><img src="other/blankname.png" height="360" alt="sample"></p>
 
 2. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
-<a href="https://github.com/QIDITECH/QIDI_MAX3/releases">Jump link </a>
+<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.1/MAX3_V4.3.0.rar">Jump link </a>
 3. Place the files in the USB drive, such as
 
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
@@ -21,23 +21,7 @@ QIDI provides a packaged version file in the version bar next to it. Please down
 4. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
 
 
-#### Compile
-1. Connect machines to the network and connect through SSH
-2. Log in as root.The password is `makerbase`
-3. After logging in, enter the following code block
-```shell
-cd /root
-rm -rf xindi
-git clone https://github.com/QIDITECH/QIDI_MAX3.git
-```
-4. Code cloning may take some time, please be patient. If there are certificate issues, please confirm if the system time is correct. After the code cloning is completed, enter the following code block
-```shell
-mv QIDI_MAX3 xindi
-cd /root/xindi/build
-cmake ..
-make
-```
-5. The complete code compilation also takes some time, patiently wait for the compilation to complete, shut down and wait for 20 seconds before starting.
+
 
 ## Report Issues and Make Suggestions
 
