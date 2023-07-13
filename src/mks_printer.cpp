@@ -174,7 +174,8 @@ bool filament_switch_sensor_fila_filament_detected = false;
 bool filament_switch_sensor_fila_enabled = false;
 
 // output_pin caselight
-float printer_caselight_value = 0;
+//4.3.4 CLL 修复开机读取不到状态
+float printer_caselight_value = -1;
 
 // probe
 float printer_probe_x_zoffset = 0.0;

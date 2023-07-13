@@ -333,6 +333,10 @@ extern std::string output_console;
 //3.1.0 CLL 新增热床调平
 extern bool printer_bed_leveling;
 
+//4.3.4 CLL 耗材确认弹窗新增不再提示按钮
+extern bool preview_pop_1_on;
+extern bool preview_pop_2_on;
+
 /* 更新页面处理 */
 void refresh_page_show() {
     if (current_page_id != TJC_PAGE_PRINTING) {
@@ -2210,7 +2214,10 @@ void refresh_page_main() {
     send_cmd_val(tty_fd, "n2", std::to_string(printer_hot_temperature));
 
     // MKSLOG_RED("LED灯的状态: %f", printer_caselight_value);
-    if (printer_caselight_value == 0) {             // LED灯的logo
+    //4.3.4 CLL 修复开机读取不到状态
+    if (printer_caselight_value == -1) {
+        get_object_status();
+    } else if (printer_caselight_value == 0) {             // LED灯的logo
         send_cmd_picc(tty_fd, "b0", "1");
     } else {
         send_cmd_picc(tty_fd, "b0", "2");
@@ -3121,8 +3128,11 @@ void go_to_network() {
         page_wifi_ssid_list_pages = 0;
         page_wifi_current_pages = 0;
         page_to(TJC_PAGE_WIFI_LIST_2);
-        send_cmd_txt(tty_fd, "t0", get_wlan0_ip().data());
-        get_wlan0_status();
+        //4.3.4 CLL 修复WiFi刷新bug
+        //send_cmd_txt(tty_fd, "t0", get_wlan0_ip().data());
+        
+		//get_wlan0_status();
+        scan_ssid_and_show();
         if (strcmp(status_result.wpa_state, "COMPLETED") == 0) {
             current_connected_ssid_name = status_result.ssid;       // 如果已经连接wifi，获取wifi的名字
         } else if (strcmp(status_result.wpa_state, "INACTIVE")) {
@@ -3135,7 +3145,9 @@ void go_to_network() {
     }
 }
 
+//4.3.4 CLL 修复WiFi刷新bug
 void scan_ssid_and_show() {
+    if (access("/var/run/wpa_supplicant/wlan0", F_OK) == 0){
     get_wlan0_status();
     mks_wpa_scan_scanresults();
     // mks_wpa_scan();
@@ -3143,9 +3155,16 @@ void scan_ssid_and_show() {
     page_wifi_current_pages = 0;
     set_page_wifi_ssid_list(page_wifi_current_pages);
     refresh_page_wifi_list();
+    } else{
+	    mks_page_internet_ip = get_eth0_ip();
+		page_to(TJC_PAGE_INTERNET);
+		send_cmd_txt(tty_fd, "t0", mks_page_internet_ip);
+	}
 }
 
 void refresh_page_wifi_list() {
+     //4.3.4 CLL 修复WiFi刷新bug
+    if (access("/var/run/wpa_supplicant/wlan0", F_OK) == 0){
     for (int i = 0; i < 5; i++) {
         std::cout << "刷新的wifi: " << page_wifi_ssid_list[i] << std::endl;
         // send_cmd_txt(tty_fd, "t" + std::to_string(i+1), page_wifi_ssid_list[i]);
@@ -3178,33 +3197,34 @@ void refresh_page_wifi_list() {
         } else {
             send_cmd_picc(tty_fd, "wifi1", "102");
             page_wifi_list_ssid_button_enabled[0] = true;
-        }
+            }
 
         if (page_wifi_ssid_list[i] == "") {
-            std::cout << "刷新为没有锁的图片" << std::endl;
-            send_cmd_picc(tty_fd, "wifi" + std::to_string(i + 1), "358");
-            send_cmd_picc2(tty_fd, "wifi" + std::to_string(i + 1), "359");
-            page_wifi_list_ssid_button_enabled[i] = false;
-        } else {
-            std::cout << "刷新为有锁的图片" << std::endl;
-            send_cmd_picc(tty_fd, "wifi" + std::to_string(i + 1), "102");
-            send_cmd_picc2(tty_fd, "wifi" + std::to_string(i + 1), "323");
-            page_wifi_list_ssid_button_enabled[i] = true;
-        }
-
-        if (page_wifi_ssid_list_pages == 0) {
-            send_cmd_picc(tty_fd, "b0", "104");
-            send_cmd_picc(tty_fd, "b1", "106");
-        } else {
-            if (page_wifi_current_pages == 0) {
-                send_cmd_picc(tty_fd, "b0", "104");
+                std::cout << "刷新为没有锁的图片" << std::endl;
+                send_cmd_picc(tty_fd, "wifi" + std::to_string(i + 1), "358");
+                send_cmd_picc2(tty_fd, "wifi" + std::to_string(i + 1), "359");
+                page_wifi_list_ssid_button_enabled[i] = false;
             } else {
-                send_cmd_picc(tty_fd, "b0", "103");
+                std::cout << "刷新为有锁的图片" << std::endl;
+                send_cmd_picc(tty_fd, "wifi" + std::to_string(i + 1), "102");
+                send_cmd_picc2(tty_fd, "wifi" + std::to_string(i + 1), "323");
+                page_wifi_list_ssid_button_enabled[i] = true;
             }
-            if (page_wifi_current_pages == page_wifi_ssid_list_pages - 1) {
+
+             if (page_wifi_ssid_list_pages == 0) {
+                send_cmd_picc(tty_fd, "b0", "104");
                 send_cmd_picc(tty_fd, "b1", "106");
             } else {
-                send_cmd_picc(tty_fd, "b1", "105");
+                if (page_wifi_current_pages == 0) {
+                    send_cmd_picc(tty_fd, "b0", "104");
+                } else {
+                    send_cmd_picc(tty_fd, "b0", "103");
+                }
+                if (page_wifi_current_pages == page_wifi_ssid_list_pages - 1) {
+                    send_cmd_picc(tty_fd, "b1", "106");
+                } else {
+                    send_cmd_picc(tty_fd, "b1", "105");
+                }
             }
         }
     }
@@ -3790,10 +3810,10 @@ void check_filament_type() {
         filament_type = file_metadata_filament_name;
     }
     std::transform(filament_type.begin(), filament_type.end(), filament_type.begin(), tolower);
-    MKSLOG_YELLOW("filament_type : %s",filament_type.c_str());
-    if (filament_type.find("pla") != -1 || filament_type.find("petg") != -1) {
+    //4.3.4 CLL 耗材确认弹窗新增不再提示按钮
+    if ((filament_type.find("pla") != -1 || filament_type.find("petg") != -1) && preview_pop_1_on == true) {
         page_to(TJC_PAGE_PREVIEW_POP_1);
-    }else if (filament_type.find("abs") != -1) {
+    }else if (filament_type.find("abs") != -1 && preview_pop_2_on == true) {
         page_to(TJC_PAGE_PREVIEW_POP_2);
     }else {
         page_to(TJC_PAGE_PRINTING);
