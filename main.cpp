@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 		find_screen_tft_file = false;
 		MKSLOG_BLUE("没有找到tft升级文件");
 	}
-	
+	/*
 	if (set_GPIO1_C5_high() == 0) {
 		MKSLOG("GPIO1_C5拉高成功");
 	} else {
@@ -80,18 +80,19 @@ int main(int argc, char** argv) {
 	} else {
 		MKSLOG("GPIO1_C3初始化失败");
 	}
+    */
 
 	if (find_screen_tft_file == true) {
 		system("/root/uart; mv /root/800_480.tft /root/800_480.tft.bak");
 		find_screen_tft_file = false;
 	}
 
-	pthread_t monitor_thread;
-	pthread_t monitor_C3_thread;
+	// pthread_t monitor_thread;
+	// pthread_t monitor_C3_thread;
 	pthread_t wpa_recv_thread;
 
-	pthread_create(&monitor_thread, NULL, monitor_GPIO1_B2, NULL);
-	pthread_create(&monitor_C3_thread, NULL, monitor_GPIO1_C3, NULL);
+	// pthread_create(&monitor_thread, NULL, monitor_GPIO1_B2, NULL);
+	// pthread_create(&monitor_C3_thread, NULL, monitor_GPIO1_C3, NULL);
 	pthread_create(&wpa_recv_thread, NULL, mks_wifi_hdlevent_thread, NULL);
 
 	bool done = false;

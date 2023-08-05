@@ -69,7 +69,8 @@ void parse_gcode_response(nlohmann::json params) {
             std::cout << (std::string)matchResult[1] << std::endl;
             std::cout << (std::string)matchResult[2] << std::endl;
             std::cout << "成功获得PID的数值" << std::endl;
-        } else if (params0.substr(0, 20) == "// probe: z_offset: ") {
+        //4.1.4 CLL 修改调平
+        /*} else if (params0.substr(0, 20) == "// probe: z_offset: ") {
             MKSLOG_RED("得到z_offset: %s", params0.substr(20).c_str());
             float temp;
             std::stringstream ss;
@@ -90,7 +91,7 @@ void parse_gcode_response(nlohmann::json params) {
             temp = temp - 0.15;          // 按照要求减去0.15mm
             std::string value = std::to_string(temp);
             std::string babystep = value.substr(0, value.find(".") + 4);
-            set_mks_babystep(babystep);               // 设置babystep到我们的配置文件里面去
+            set_mks_babystep(babystep);               // 设置babystep到我们的配置文件里面去*/
         } else if (params0 == "// action:cancel") {
             //3.1.0 修复函数冲突问题
             //back_to_main();

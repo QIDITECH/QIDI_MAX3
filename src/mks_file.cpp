@@ -190,20 +190,38 @@ void get_page_files_filelist(std::string current_dir) {
     page_files_dirname_filename_list.clear();
     nlohmann::json json_temp;
     nlohmann::json result;
-    std::string json_files_directory = send_request("localhost", "7125", "server/files/directory?path=" + current_dir, "GET");
+    //4.3.6 CLL 新增上次打印文件在文件列表第一页第一个显示
+    std::string temp_dirname = "";
+    std::string temp_filename = "";
+    std::string json_files_directory = send_request("localhost", "7125", "server/files/directory?path=gcodes//.cache", "GET");
+    if (json_files_directory != "" && page_files_folder_layers == 0) {
+        json_temp = nlohmann::json::parse(json_files_directory);
+        result = json_temp["result"];
+        if (0 < result["files"].size()) {
+            std::cout << result["files"][0]["filename"] << std::endl;
+            temp_filename = result["files"][0]["filename"];
+            if (temp_filename.find(".gcode") != -1) {
+                if (temp_filename.find(".") != 0) {
+                    page_files_filename_list.insert(temp_filename);
+                    auto it = page_files_filename_list.begin();
+                    page_files_dirname_filename_list.insert("[c] " + *it);
+                    page_files_filename_list.clear();
+                }
+            }
+        }
+    }
+    json_files_directory = send_request("localhost", "7125", "server/files/directory?path=" + current_dir, "GET");
     // std::cout << json_files_directory << std::endl;
     if (json_files_directory != "") {
         json_temp = nlohmann::json::parse(json_files_directory);
         result = json_temp["result"];
         // std::cout << result << std::endl;
     }
-    std::string temp_dirname = "";
-    std::string temp_filename = "";
 
     //3.1.4 CLL 新增屏蔽文件夹
     for (int i = 0; i < result["dirs"].size(); i++) {
         temp_dirname = result["dirs"][i]["dirname"];
-        if (temp_dirname != "System Volume Information" && temp_dirname.find(".") != 0) {
+        if (temp_dirname != "System Volume Information" && temp_dirname.find(".") != 0 && temp_dirname != ".cache") {
             page_files_dirname_list.insert(temp_dirname);
         }
     }
@@ -329,6 +347,13 @@ void get_sub_dir_files_list(int button) {
         page_to(TJC_PAGE_PREVIEW);
         // generate_gimage(page_files_print_files_path);
         // generate_simage(page_files_print_files_path);
+    } else if ("[c]" == page_files_list_show_type[button]) { //4.3.6 CLL 新增打印过文件会在文件列表第一页首个显示
+        show_preview_complete = false;
+        page_files_path_stack.push(page_files_path);
+        page_files_print_files_path =page_files_path + "/.cache/" + page_files_list_show_name[button];
+        page_files_folder_layers++;
+        get_file_estimated_time(page_files_print_files_path.substr(1));
+        page_to(TJC_PAGE_PREVIEW);
     }
     // std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$" << "/home/mks/gcode_files" + page_files_print_files_path << "$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 }
@@ -365,8 +390,9 @@ void get_parenet_dir_files_list() {
         }
     } else {
         page_to(TJC_PAGE_FILE_LIST_1);
+        page_files_folder_layers = 0;
+        refresh_page_files(page_files_current_pages);
         refresh_page_files_list_1();
-        page_files_folder_layers--;
         page_files_previous_path = "";
         page_files_path = "";
     }

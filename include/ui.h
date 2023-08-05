@@ -286,7 +286,6 @@
 #define TJC_PAGE_LEVEL_MODE_AUTO_LEVEL      0x09
 #define TJC_PAGE_LEVEL_MODE_MANUAL_LEVEL    0x0b
 #define TJC_PAGE_LEVEL_MODE_SET_ZOFFSET     0x0a
-#define TJC_PAGE_LEVEL_MODE_CALIBRATION     0x0a
 #define TJC_PAGE_LEVEL_MODE_SYNTONY_MOVE    0x0c
 #define TJC_PAGE_LEVEL_MODE_PID             0x0d
 
@@ -466,8 +465,8 @@
 
 #define TJC_PAGE_SET_ZOFFSET_2              54
 #define TJC_PAGE_SET_ZOFFSET_2_001          0x02
-#define TJC_PAGE_SET_ZOFFSET_2_0025         0x03
-#define TJC_PAGE_SET_ZOFFSET_2_005          0x04
+#define TJC_PAGE_SET_ZOFFSET_2_005          0x03
+#define TJC_PAGE_SET_ZOFFSET_2_01           0x04
 #define TJC_PAGE_SET_ZOFFSET_2_1            0x09
 #define TJC_PAGE_SET_ZOFFSET_2_UP           0x05
 #define TJC_PAGE_SET_ZOFFSET_2_DOWN         0x06
@@ -662,6 +661,12 @@
 #define TJC_PAGE_PREVIEW_POP_YES             0x00
 //4.3.4 CLL 耗材确认弹窗新增不再提示按钮
 #define TJC_PAGE_PREVIEW_POP_NO_POP        0x01
+
+//4.3.6 CLL 新增息屏功能
+#define TJC_PAGE_SCREEN_SLEEP              116
+#define TJC_PAGE_SCREEN_SLEEP_ENTER        0x00
+#define TJC_PAGE_SCREEN_SLEEP_EXIT         0x01
+
 
 #endif
 
