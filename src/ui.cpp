@@ -127,6 +127,9 @@ extern bool previous_filament_sensor_state;
 bool previous_caselight_value = false;
 extern float printer_caselight_value;
 
+//4.3.7 CLL 防止预览图界面卡死
+extern bool jump_to_print;
+
 void parse_cmd_msg_from_tjc_screen(char *cmd) {
     event_id = cmd[0];
     MKSLOG_BLUE("#########################%s", cmd);
@@ -756,7 +759,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         switch (widget_id)
         {
         case TJC_PAGE_PREVIEW_BTN_BACK:
-            if (mks_file_parse_finished == false) {
+            //4.3.7 CLL 防止在预览图界面卡死
+            if (printer_print_stats_state == "printing" || printer_print_stats_state == "paused") {
+                page_to(TJC_PAGE_PRINTING);
+                jump_to_print = false;
+            } else if (mks_file_parse_finished == false) {
                 get_parenet_dir_files_list();
                 clear_page_preview();                   // 返回时清除读取的数据
                 show_preview_complete = false;
@@ -793,7 +800,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
 
         case TJC_PAGE_PREVIEW_BTN_START:
             std::cout << "文件路径：" << page_files_print_files_path << std::endl;
-            if (show_preview_complete == true) {        // 当且仅当预览加载完成才可以按下按钮
+            //4.3.7 CLL 防止在预览图界面卡死
+            if (printer_print_stats_state == "printing" || printer_print_stats_state == "paused") {
+                page_to(TJC_PAGE_PRINTING);
+                jump_to_print = false;
+            } else if (show_preview_complete == true) {        // 当且仅当预览加载完成才可以按下按钮
                 //3.1.0 CLL 修复页面跳转bug
                 printer_ready = false;
                 //2023.4.21-2 实现打印过文件标红
@@ -1241,12 +1252,12 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             move_motors_off();
             //2023.4.22-1 修改退料流程
             if ((printer_extruder_temperature >= (printer_extruder_target - 5))&&(printer_extruder_temperature <= (printer_extruder_target + 5))) {
+                page_to(TJC_PAGE_FILAMENT_POP_4);
                 //4.3.5 CLL 修复断料检测与退料冲突bug
-                if (filament_switch_sensor_fila_enabled == 1) {
+                if (filament_switch_sensor_fila_enabled == true) {
                     previous_filament_sensor_state = true;
                     set_filament_sensor();
                 }
-                page_to(TJC_PAGE_FILAMENT_POP_4);
             }else {
                 page_to(TJC_PAGE_FILAMENT_POP);
             }
@@ -1263,7 +1274,14 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             printer_idle_timeout_state = "Printing";
             page_filament_extrude_button = true;
             
-            start_retract();
+            //4.3.7 CLL 修复耗材进出与断料检测冲突
+            if (filament_switch_sensor_fila_enabled == true) {
+                set_filament_sensor();
+                previous_filament_sensor_state = true;
+                start_retract();
+            } else {
+                start_retract();
+            }
 
             break;
 
@@ -1271,7 +1289,14 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             printer_idle_timeout_state = "Printing";
             page_filament_extrude_button = true;
             
-            start_extrude();
+            //4.3.7 CLL 修复耗材进出与断料检测冲突
+            if (filament_switch_sensor_fila_enabled == true) {
+                set_filament_sensor();
+                previous_filament_sensor_state = true;
+                start_extrude();
+            } else {
+                start_extrude();
+            }
             break;
 
         case TJC_PAGE_FILAMENT_BTN_EXTRUDER:
@@ -2560,6 +2585,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             }
             break;
 
+        //4.3.7 CLL 新增恢复出厂设置功能
+        case TJC_PAGE_ABOUT_RESTORE:
+            page_to(TJC_PAGE_RESTORE_CONFIG);
+            break;
+
         default:
             break;
         }
@@ -2649,6 +2679,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
                 set_mks_oobe_enabled(true);
                 send_cmd_picc(tty_fd, "b1", "367");
             }
+            break;
+
+        //4.3.7 CLL 新增恢复出厂设置功能
+        case TJC_PAGE_NO_UPDATA_RESTORE:
+            page_to(TJC_PAGE_RESTORE_CONFIG);
             break;
 
         default:
@@ -2758,7 +2793,8 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             break;
 
         case TJC_PAGE_STOP_PRINT_NO:
-            page_to(TJC_PAGE_PRINTING);
+            //4.3.7 CLL 修复页面跳转bug
+            page_to(previous_page_id);
             break;
         }
         break;
@@ -3309,8 +3345,8 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         case TJC_PAGE_SCREEN_SLEEP_ENTER:
             page_to(TJC_PAGE_SCREEN_SLEEP);
             if (printer_caselight_value == 1) {
-                led_on_off();
                 previous_caselight_value = true;
+                led_on_off();
             } else {
                 previous_caselight_value =false;
             }
@@ -3336,6 +3372,23 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             }
             break;
         
+        default:
+            break;
+        }
+        break;
+
+    //4.3.7 CLL 新增恢复出厂设置功能
+    case TJC_PAGE_RESTORE_CONFIG:
+        switch(widget_id)
+        {
+        case TJC_PAGE_RESTORE_CONFIG_YES:
+            restore_config();
+            break;
+
+        case TJC_PAGE_RESTORE_CONFIG_NO:
+            go_to_about();
+            break;
+
         default:
             break;
         }
@@ -3467,7 +3520,10 @@ void tjc_event_setted_handler(int page_id, int widget_id, unsigned char first, u
                 number = 350;
             }
             set_extruder_target(number);
-            set_mks_extruder_target(number);
+            //4.3.7 CLL 设置喷头温度保存下限为170
+            if (number > 170) {
+                set_mks_extruder_target(number);
+            }
             page_to(TJC_PAGE_FILAMENT);
             break;
 

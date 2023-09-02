@@ -389,20 +389,32 @@ void refresh_page_show() {
             // MKSLOG_BLUE("来到这个地方, # %s", printer_print_stats_filename.data());
             if (printer_print_stats_state == "printing") {
                 if (printer_print_stats_filename != "") {
+                    sleep(5);
                     MKSLOG_BLUE("跳入到打印函数\n");
                     //4.3.6 CLL 新增息屏功能
                     if (previous_caselight_value == true) {
                         led_on_off();
                         previous_caselight_value = false;
                     }
-                    if (level_mode_printing_is_printing_level == false) {
-                        //3.1.0 CLL 使网页打印显示预览图
+                    //4.3.7 CLL 修改网页打印信息订阅
+                    if (jump_to_print == true) {
+                        print_start();
                         printer_ready = false;
                         show_preview_complete = false;
-                        jump_to_print = true;
                         page_to(TJC_PAGE_PREVIEW);
+                        break;
                     } else {
-                        page_to(TJC_PAGE_LEVEL_PRINT);
+                        print_start();  //2023.5.8 CLL 打印前发送"PRINT_START"指令
+                        if (level_mode_printing_is_printing_level == false) {
+                            printer_ready = false;
+                            //3.1.0 使网页打印显示预览图
+                            //show_preview_complete = false;
+                            //jump_to_print = true;
+                            //page_to(TJC_PAGE_PREVIEW);
+                            page_to(TJC_PAGE_PRINTING);
+                        } else {
+                            page_to(TJC_PAGE_LEVEL_PRINT);
+                        }
                     }
                 }
             }
@@ -441,6 +453,8 @@ void refresh_page_show() {
         case TJC_PAGE_ABOUT:
         case TJC_PAGE_NO_UPDATA:
         case TJC_PAGE_SERVICE:
+        case TJC_PAGE_RESTORING:
+        case TJC_PAGE_RESTORE_CONFIG:
             break;
         
         default:
@@ -694,6 +708,10 @@ void refresh_page_show() {
     //4.3.6 CLL 修复UI按下效果
     case TJC_PAGE_OPEN_LEVEL:
         refresh_page_open_level();
+        break;
+
+    case TJC_PAGE_RESTORING:
+        refresh_page_restoring();
         break;
 
     default:
@@ -1385,7 +1403,7 @@ void refresh_page_manual_level() {
 
 void refresh_page_print_filament() {
 
-    MKSLOG_BLUE("Printer ide_timeout state: %s", printer_idle_timeout_state.c_str());
+    MKSLOG_BLUE("Printer idle_timeout state: %s", printer_idle_timeout_state.c_str());
     MKSLOG_BLUE("Printer webhooks state: %s", printer_webhooks_state.c_str());
 
     /*
@@ -1464,6 +1482,11 @@ void refresh_page_print_filament() {
             send_cmd_vid_en(tty_fd, "gm0", 0);
             page_print_filament_extrude_restract_button = false;
         }
+    }
+
+    //4.3.7 CLL 打印时长时间暂停造成的打印中止会跳转至主页面
+    if (printer_idle_timeout_state == "Idle") {
+        page_to(TJC_PAGE_MAIN);
     }
 
 }
@@ -1834,6 +1857,11 @@ void refresh_page_filament() {
                 page_to(TJC_PAGE_FILAMENT_POP_5);
                 page_filament_unload_button = false;
             }
+            //4.3.7 CLL 修复耗材进出与断料检测冲突
+            if (previous_filament_sensor_state == true) {
+                set_filament_sensor();
+                previous_filament_sensor_state = false;
+            }
         }
     // }
 }
@@ -2169,164 +2197,164 @@ void refresh_page_preview() {
     }
     // MKSLOG_RED("进入到刷新预览图的页面, show_preview_complete %d", show_preview_complete);
     if (mks_file_parse_finished == true ) {
-    if (show_preview_complete == false) {
+        if (show_preview_complete == false) {
 
-        //4.3.6 CLL 打印文件仅显示文件名
-        //send_cmd_txt(tty_fd, "t0", file_metadata_filename);
-        send_cmd_txt(tty_fd, "t0", file_metadata_filename.substr(file_metadata_filename.rfind("/") + 1));
+            //4.3.6 CLL 打印文件仅显示文件名
+            //send_cmd_txt(tty_fd, "t0", file_metadata_filename);
+            send_cmd_txt(tty_fd, "t0", file_metadata_filename.substr(file_metadata_filename.rfind("/") + 1));
 
-        MKSLOG_BLUE("file_metadata_estimated_time %d", file_metadata_estimated_time);
-        MKSLOG_BLUE("file_metadata_filament_weight_total %f", file_metadata_filament_weight_total);
-        MKSLOG_BLUE("file_metadata_filament_total %f", file_metadata_filament_total);
-        MKSLOG_BLUE("file_metadata_filament_name %s", file_metadata_filament_name.c_str());
-        MKSLOG_BLUE("file_metadata_filament_type %s", file_metadata_filament_type.c_str());
-        if (file_metadata_estimated_time) {
-            send_cmd_txt(tty_fd, "t1", show_time(file_metadata_estimated_time));
-        } else {
-            send_cmd_txt(tty_fd, "t1", "-");
-        }
+            MKSLOG_BLUE("file_metadata_estimated_time %d", file_metadata_estimated_time);
+            MKSLOG_BLUE("file_metadata_filament_weight_total %f", file_metadata_filament_weight_total);
+            MKSLOG_BLUE("file_metadata_filament_total %f", file_metadata_filament_total);
+            MKSLOG_BLUE("file_metadata_filament_name %s", file_metadata_filament_name.c_str());
+            MKSLOG_BLUE("file_metadata_filament_type %s", file_metadata_filament_type.c_str());
+            if (file_metadata_estimated_time) {
+                send_cmd_txt(tty_fd, "t1", show_time(file_metadata_estimated_time));
+            } else {
+                send_cmd_txt(tty_fd, "t1", "-");
+            }
 
-        if (file_metadata_filament_weight_total) {
-            std::string temp = std::to_string(file_metadata_filament_weight_total);
-            
-            send_cmd_txt(tty_fd, "t2", temp.substr(0, temp.find(".") + 2) + "g");
-        } else {
-            send_cmd_txt(tty_fd, "t2", "-");
-        }
+            if (file_metadata_filament_weight_total) {
+                std::string temp = std::to_string(file_metadata_filament_weight_total);
+                
+                send_cmd_txt(tty_fd, "t2", temp.substr(0, temp.find(".") + 2) + "g");
+            } else {
+                send_cmd_txt(tty_fd, "t2", "-");
+            }
 
-        if (file_metadata_filament_total) {
-            std::string temp = std::to_string(file_metadata_filament_total / 1000);
-            send_cmd_txt(tty_fd, "t3", temp.substr(0, temp.find(".") + 2) + "m");
-        } else {
-            send_cmd_txt(tty_fd, "t3", "-");
-        }
+            if (file_metadata_filament_total) {
+                std::string temp = std::to_string(file_metadata_filament_total / 1000);
+                send_cmd_txt(tty_fd, "t3", temp.substr(0, temp.find(".") + 2) + "m");
+            } else {
+                send_cmd_txt(tty_fd, "t3", "-");
+            }
 
-        //3.1.3 CLL 新增识别耗材种类
-        if (file_metadata_filament_type != "") {
-            send_cmd_txt(tty_fd, "t4", file_metadata_filament_type);
-        } else if (file_metadata_filament_name != ""){
-            send_cmd_txt(tty_fd, "t4", file_metadata_filament_name);
-        } else {
-            send_cmd_txt(tty_fd, "t4", "-");
-        }
+            //3.1.3 CLL 新增识别耗材种类
+            if (file_metadata_filament_type != "") {
+                send_cmd_txt(tty_fd, "t4", file_metadata_filament_type);
+            } else if (file_metadata_filament_name != ""){
+                send_cmd_txt(tty_fd, "t4", file_metadata_filament_name);
+            } else {
+                send_cmd_txt(tty_fd, "t4", "-");
+            }
 
-        // std::cout << file_metadata_gimage << std::endl;
+            // std::cout << file_metadata_gimage << std::endl;
 
-        // 刷小图
-        if (show_preview_gimage_completed == false) {
-            
-            send_cmd_txt(tty_fd, "preview.cp0_text", "");
-            send_cmd_txt(tty_fd, "preview.add", "");
-            if (file_metadata_simage != "") {
-                std::cout << "刷小图" << std::endl;
-                int num = 1024;
-                int len = file_metadata_simage.length();
-                int end = num;
-                std::string s;
-                for (int start = 0; start < len;) {
-                    if (end > len) {
-                        s = file_metadata_simage.substr(start, len - start);
+            // 刷小图
+            if (show_preview_gimage_completed == false) {
+                
+                send_cmd_txt(tty_fd, "preview.cp0_text", "");
+                send_cmd_txt(tty_fd, "preview.add", "");
+                if (file_metadata_simage != "") {
+                    std::cout << "刷小图" << std::endl;
+                    int num = 1024;
+                    int len = file_metadata_simage.length();
+                    int end = num;
+                    std::string s;
+                    for (int start = 0; start < len;) {
+                        if (end > len) {
+                            s = file_metadata_simage.substr(start, len - start);
+                            send_cmd_txt(tty_fd, "add", s);
+                            tcdrain(tty_fd);
+                            send_cmd_txt_plus(tty_fd, "cp0_text", "cp0_text", "add");
+                            tcdrain(tty_fd);
+                            break;
+                        }
+                        s = file_metadata_simage.substr(start, num);
+                        start = end;
+                        end = end + num;
                         send_cmd_txt(tty_fd, "add", s);
                         tcdrain(tty_fd);
                         send_cmd_txt_plus(tty_fd, "cp0_text", "cp0_text", "add");
                         tcdrain(tty_fd);
+                    }
+                }
+
+                // 刷大图
+                if (jump_to_print == false) {
+                    send_cmd_cp_close(tty_fd, "preview.cp0");
+                    if (file_metadata_gimage != "") {
+                        std::cout << "刷大图" << std::endl;
+                        // std::cout << "图片字符串的大小为: " << file_metadata_gimage.length() << std::endl;
+                        // std::cout << "图片的字节大小为：" << file_metadata_gimage.size() << std::endl;
+                        int num = 1024;
+                        int len = file_metadata_gimage.length();
+                        int end = num;
+                        std::string g;
+                        // int i = 0;
+                        for (int start = 0; start < len;) {
+                            if (end > len) {
+                                g = file_metadata_gimage.substr(start, len - start);
+                                // std::cout << "字串" << i <<  ":" << s << std::endl;
+                                send_cmd_cp_image(tty_fd, "cp0", g);
+                                tcdrain(tty_fd);
+                                break;
+                            }
+                            g = file_metadata_gimage.substr(start, num);
+                            start = end;
+                            end = end + num;
+                            // std::cout << "字串" << i <<  ":" << s << std::endl;
+                            // i++;
+                            send_cmd_cp_image(tty_fd, "cp0", g);
+                            // usleep(40000);
+                            tcdrain(tty_fd);
+                        }
+                    }
+                    show_preview_gimage_completed = true;
+                    //3.1.0 CLL 新增热床调平
+                    bed_leveling_switch(true);
+                }
+            }
+            
+
+            /*
+            if (file_metadata_simage != "") {
+                int num = 500;
+                int len = file_metadata_simage.length();
+                int end = num;
+                std::string s;
+                int i = 0;
+                send_cmd_txt_start(tty_fd, "cp0_text");
+                for (int start = 0; start < len;) {
+                    if (end > len) {
+                        s = file_metadata_simage.substr(start, len - start);
+                        // std::cout << "字串" << i <<  ":" << s << std::endl;
+                        send_cmd_txt_data(tty_fd, s);
                         break;
                     }
                     s = file_metadata_simage.substr(start, num);
                     start = end;
                     end = end + num;
-                    send_cmd_txt(tty_fd, "add", s);
-                    tcdrain(tty_fd);
-                    send_cmd_txt_plus(tty_fd, "cp0_text", "cp0_text", "add");
-                    tcdrain(tty_fd);
+                    // std::cout << "字串" << i <<  ":" << s << std::endl;
+                    i++;
+                    send_cmd_txt_data(tty_fd, s);
+                    // sleep(1);
+                    usleep(50000);
                 }
+                send_cmd_txt_end(tty_fd);
             }
-
-            // 刷大图
-            if (jump_to_print == false) {
-                send_cmd_cp_close(tty_fd, "preview.cp0");
-                if (file_metadata_gimage != "") {
-                    std::cout << "刷大图" << std::endl;
-                    // std::cout << "图片字符串的大小为: " << file_metadata_gimage.length() << std::endl;
-                    // std::cout << "图片的字节大小为：" << file_metadata_gimage.size() << std::endl;
-                    int num = 1024;
-                    int len = file_metadata_gimage.length();
-                    int end = num;
-                    std::string g;
-                    // int i = 0;
-                    for (int start = 0; start < len;) {
-                        if (end > len) {
-                            g = file_metadata_gimage.substr(start, len - start);
-                            // std::cout << "字串" << i <<  ":" << s << std::endl;
-                            send_cmd_cp_image(tty_fd, "cp0", g);
-                            tcdrain(tty_fd);
-                            break;
-                        }
-                        g = file_metadata_gimage.substr(start, num);
-                        start = end;
-                        end = end + num;
-                        // std::cout << "字串" << i <<  ":" << s << std::endl;
-                        // i++;
-                        send_cmd_cp_image(tty_fd, "cp0", g);
-                        // usleep(40000);
-                        tcdrain(tty_fd);
-                    }
-                }
-                show_preview_gimage_completed = true;
+            */
+            show_preview_complete = true;
+            if (jump_to_print == true){
+                //3.1.0 开始打印前发送PRINT_START_QD
+                print_start();
+                //3.1.0 CLL 新增网页打印过文件标红
+                //printed_file_path = "/" + printer_print_stats_filename;
+                jump_to_print = false;
                 //3.1.0 CLL 新增热床调平
                 bed_leveling_switch(true);
+                //3.1.3 CLL 打印前判断耗材种类并弹窗
+                check_filament_type();
+                //page_to(TJC_PAGE_PRINTING);
             }
+            // file_metadata_filename = "";
+            // file_metadata_estimated_time = 0;
+            // file_metadata_filament_weight_total = 0;
+            // file_metadata_filament_name = "";
+            // file_metadata_simage = "";
+            // file_metadata_gimage = "";
+            
         }
-        
-
-        /*
-        if (file_metadata_simage != "") {
-            int num = 500;
-            int len = file_metadata_simage.length();
-            int end = num;
-            std::string s;
-            int i = 0;
-            send_cmd_txt_start(tty_fd, "cp0_text");
-            for (int start = 0; start < len;) {
-                if (end > len) {
-                    s = file_metadata_simage.substr(start, len - start);
-                    // std::cout << "字串" << i <<  ":" << s << std::endl;
-                    send_cmd_txt_data(tty_fd, s);
-                    break;
-                }
-                s = file_metadata_simage.substr(start, num);
-                start = end;
-                end = end + num;
-                // std::cout << "字串" << i <<  ":" << s << std::endl;
-                i++;
-                send_cmd_txt_data(tty_fd, s);
-                // sleep(1);
-                usleep(50000);
-            }
-            send_cmd_txt_end(tty_fd);
-        }
-        */
-        show_preview_complete = true;
-        if (jump_to_print == true){
-            //3.1.0 开始打印前发送PRINT_START_QD
-            print_start();
-            //3.1.0 CLL 新增网页打印过文件标红
-            //printed_file_path = "/" + printer_print_stats_filename;
-            jump_to_print = false;
-            //3.1.0 CLL 新增热床调平
-            bed_leveling_switch(true);
-            //3.1.3 CLL 打印前判断耗材种类并弹窗
-            check_filament_type();
-            //page_to(TJC_PAGE_PRINTING);
-        }
-        // file_metadata_filename = "";
-        // file_metadata_estimated_time = 0;
-        // file_metadata_filament_weight_total = 0;
-        // file_metadata_filament_name = "";
-        // file_metadata_simage = "";
-        // file_metadata_gimage = "";
-        
-    }
     }
 }
 
@@ -2925,10 +2953,13 @@ void set_filament_extruder_target(bool positive) {
     if (printer_filament_extruder_target < 0) {
         printer_filament_extruder_target = 0;
         set_extruder_target(0);
-        set_mks_extruder_target(0);
+        //set_mks_extruder_target(0);
     } else {
         set_extruder_target(printer_filament_extruder_target);
-        set_mks_extruder_target(printer_filament_extruder_target);
+        //4.3.7 CLL 设置喷头温度保存下限170
+        if (printer_filament_extruder_target > 170) {
+            set_mks_extruder_target(printer_filament_extruder_target);
+        }
     }
 }
 
@@ -3065,8 +3096,11 @@ void led_on_off() {
         set_mks_led_status();
     } else {
         ep->Send(json_run_a_gcode("SET_PIN PIN=caselight VALUE=0"));
-        mks_led_status = false;
-        set_mks_led_status();
+        //4.3.8 CLL 息屏不保存状态
+        if (previous_caselight_value == false) {
+            mks_led_status = false;
+            set_mks_led_status();
+        }
     }
 }
 
@@ -3647,10 +3681,10 @@ void filament_unload() {
     ep->Send(json_run_a_gcode("M603"));
 
     //4.3.5 CLL 修复断料检测与退料冲突bug
-    if (previous_filament_sensor_state == true) {
-        set_filament_sensor();
-        previous_filament_sensor_state = false;
-    }
+    //if (previous_filament_sensor_state == true) {
+    //    set_filament_sensor();
+    //    previous_filament_sensor_state = false;
+    //}
 }
 
 int get_cal_printed_time(int print_time) {
@@ -4107,5 +4141,19 @@ void refresh_page_open_level() {
         send_cmd_picc2(tty_fd, "b5", "283");
         send_cmd_picc(tty_fd, "b6", "263");
         send_cmd_picc2(tty_fd, "b6", "284");
+    }
+}
+
+//4.3.7 CLL 新增恢复出厂设置功能
+void restore_config() {
+    system("cp /home/mks/klipper_config/config.mksini.bak /home/mks/klipper_config/config.mksini");
+    ep->Send(json_run_a_gcode("BED_MESH_PROFILE REMOVE=\"default\"\nSAVE_CONFIG"));
+    sleep(1);
+    page_to(TJC_PAGE_RESTORING);
+}
+
+void refresh_page_restoring() {
+    if (printer_idle_timeout_state == "Ready" && printer_webhooks_state == "ready") {
+        page_to(TJC_PAGE_MAIN);
     }
 }

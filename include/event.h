@@ -247,4 +247,8 @@ void refresh_page_open_level();
 //4.3.2 CLL 修复无法读取文件名中有空格文件
 std::string replaceCharacters(const std::string& path, const std::string& searchChars, const std::string& replacement);
 
+//4.3.7 CLL 新增恢复出厂设置功能
+void restore_config();
+void refresh_page_restoring();
+
 #endif

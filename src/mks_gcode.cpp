@@ -8,6 +8,8 @@
 #include "../include/mks_log.h"
 #include "../include/mks_gcode.h"
 #include "../include/event.h"
+#include "../include/ui.h"
+#include "../include/mks_file.h"
 
 extern std::string str_manual_level_offset;
 extern std::string printer_webhooks_state;
@@ -23,13 +25,35 @@ extern bool all_level_saving;
 //3.1.0 CLL 报错弹窗
 std::string output_console;
 
+//4.3.7 CLL 收到网页操作信息会退出息屏
+extern int current_page_id;
+extern int previous_page_id;
+extern bool previous_caselight_value;
+extern std::string printer_idle_timeout_state;
+
 // extern std::string mks_babystep_value;              // 获取调平补偿值后保存babystep
+
+//4.3.7 CLL 修改网页打印信息订阅
+nlohmann::json output_metadata;
+extern bool jump_to_print;
+extern std::string printer_print_stats_state;
 
 void parse_gcode_response(nlohmann::json params) {
     std::cout << params << std::endl;
     if (params != nlohmann::detail::value_t::null) {
         std::string params0 = params[0];
         // std::cout << params0.substr(0, 23) << std::endl;
+
+        output_console = params0;
+
+        //4.3.7 CLL 收到网页操作信息会退出息屏
+        if (current_page_id == TJC_PAGE_SCREEN_SLEEP) {
+           page_to(previous_page_id);
+           if (previous_caselight_value == true) {
+                led_on_off();
+                previous_caselight_value = false;
+            }
+        }
 
         // bltouch: z_offset: 1.000
         if (params0 == "// Klipper state: Ready") {
@@ -39,7 +63,7 @@ void parse_gcode_response(nlohmann::json params) {
             // if (all_level_saving == false) {
             sleep(5);
             sub_object_status();
-            // sleep(2);
+            sleep(2);
             get_object_status();
             // printer_set_babystep();
             // sleep(1);
@@ -142,8 +166,16 @@ void parse_gcode_response(nlohmann::json params) {
 
         }else if (params0.substr(0, 2) == "!!") {
             // 3.1.0 CLL 报错弹窗
+            //output_console = params0;
             detect_error();
-            output_console = params0;
-        } 
+        } else if (params0.substr(0, 12) == "// metadata=") { //4.3.7 CLL 修改网页打印信息订阅
+            std::string str_metadata = params0.substr(12);
+            output_metadata = string2json(str_metadata);
+            std::cout << output_metadata << std::endl;
+            parse_file_estimated_time_send(output_metadata);
+            jump_to_print = true;
+            printer_print_stats_state = "printing";
+            MKSLOG_BLUE("跳转至打印");
+        }
     }
 }

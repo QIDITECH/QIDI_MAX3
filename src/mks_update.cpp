@@ -39,6 +39,9 @@ bool detected_MKS_THR_cfg;
 //3.1.4 CLL 工厂更新模式
 bool detected_gcode;
 
+//4.3.7 CLL 修改deb文件也能更新
+bool detected_soc_deb;
+
 std::ifstream tftfile;
 int tft_buff = 4096;
 int tft_start;
@@ -101,6 +104,9 @@ bool detect_update() {
     //3.1.4 CLL 工厂更新模式
     int fd_gcode;
 
+    //4.3.7 CLL 新增deb文件也能更新
+    int fd_soc_deb;
+
     fd_soc_data = access("/home/mks/gcode_files/sda1/QD_Update/"MKSUPDATE, F_OK);
     if (fd_soc_data == 0) {
         detected_soc_data = true;
@@ -139,14 +145,24 @@ bool detect_update() {
 
     //3.1.4 CLL 工厂更新模式
     fd_gcode = access("/home/mks/gcode_files/sda1/QD_Update/QD_Gcode",F_OK);
-    if (fd_gcode == 0){
+    if (fd_gcode == 0) {
         detected_gcode = true;
-    }else{
+    } else {
         detected_gcode = false;
     }
 
+    //4.3.7 CLL 新增deb文件也能更新
+    if (access("/home/mks/gcode_files/sda1/QD_factory_mode.txt",F_OK) == 0) {
+        fd_soc_deb = access("/home/mks/gcode_files/sda1/QD_Update/mks.deb",F_OK);
+        if (fd_soc_deb == 0) {
+            detected_soc_deb = true;
+        } else {
+            detected_soc_deb = false;
+        }
+    }
+
     //3.1.4 CLL 工厂更新模式
-    return (detected_soc_data | detected_mcu_data | detected_ui_data | detected_printer_cfg | detected_MKS_THR_cfg | detected_gcode);
+    return (detected_soc_data | detected_mcu_data | detected_ui_data | detected_printer_cfg | detected_MKS_THR_cfg | detected_gcode | detected_soc_deb);
 }
 
 void start_update() {
@@ -167,6 +183,10 @@ void start_update() {
                 system("mv /home/mks/gcode_files/sda1/QD_Update/"MKSUPDATE" /home/mks/gcode_files/sda1/QD_Update/mks.deb; dpkg -i /home/mks/gcode_files/sda1/QD_Update/mks.deb; mv /home/mks/gcode_files/sda1/QD_Update/mks.deb /home/mks/gcode_files/sda1/QD_Update/"MKSUPDATE".bak; sync;");
                 set_mks_babystep(mks_babystep_value);
             }
+        }
+    } else if (detected_soc_deb == true) { //4.3.7 CLL 修改deb文件可以更新
+        if (access("/home/mks/gcode_files/sda1/QD_factory_mode.txt", F_OK) == 0) {
+            system("dpkg -i /home/mks/gcode_files/sda1/QD_Update/mks.deb;sync");
         }
     }
 

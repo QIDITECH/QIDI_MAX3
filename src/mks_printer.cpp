@@ -254,7 +254,7 @@ void parse_printer_out_pin_fan3(nlohmann::json out_pin_fan3) {
     if (out_pin_fan3["value"] != nlohmann::detail::value_t::null) {
         printer_out_pin_fan3_value = out_pin_fan3["value"];
     }
-    std::cout << "printer_out_pin_fan3_value" << printer_out_pin_fan3_value <<std::endl;
+    std::cout << "printer_out_pin_fan3_value " << printer_out_pin_fan3_value <<std::endl;
 };
 
 void parse_filament_switch_sensor_fila(nlohmann::json filament_switch_sensor) {

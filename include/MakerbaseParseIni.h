@@ -9,7 +9,9 @@
 #include "./dictionary.h"
 #include "./iniparser.h"
 
-#define INIPATH "/root/config.mksini"
+//4.3.7 CLL 修改配置文件保存位置
+//#define INIPATH "/root/config.mksini"
+#define INIPATH "/home/mks/klipper_config/config.mksini"
 
 #ifdef XINDI_PLUS
 #define VERSION_PATH "/root/xindi/version"

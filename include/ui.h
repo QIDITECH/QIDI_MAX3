@@ -443,6 +443,8 @@
 #define TJC_PAGE_ABOUT_RESET                0x0a
 #define TJC_PAGE_ABOUT_UPDATE               0x0c
 #define TJC_PAGE_ABOUT_OOBE                 0x0e
+//4.3.7 CLL 新增恢复出厂设置按钮
+#define TJC_PAGE_ABOUT_RESTORE              0x0f
 
 #define TJC_PAGE_PRINT_F_POP                53
 #define TJC_PAGE_PRINT_F_POP_YES            0x02
@@ -502,6 +504,8 @@
 #define TJC_PAGE_NO_UPDATA_SERVICE          0x02
 #define TJC_PAGE_NO_UPDATA_RESET            0x09
 #define TJC_PAGE_NO_UPDATA_OOBE             0x0e
+//4.3.7 CLL 新增恢复出厂设置按钮
+#define TJC_PAGE_NO_UPDATA_RESTORE          0x0f
 
 #define TJC_PAGE_KEYDBA                     51
 #define TJC_PAGE_KEYDBA_HOME                0x2c
@@ -667,6 +671,12 @@
 #define TJC_PAGE_SCREEN_SLEEP_ENTER        0x00
 #define TJC_PAGE_SCREEN_SLEEP_EXIT         0x01
 
+//4.3.7 CLL 新增恢复出厂设置按钮             
+#define TJC_PAGE_RESTORE_CONFIG            117
+#define TJC_PAGE_RESTORE_CONFIG_YES        0x00
+#define TJC_PAGE_RESTORE_CONFIG_NO         0x01
+
+#define TJC_PAGE_RESTORING                 118
 
 #endif
 
