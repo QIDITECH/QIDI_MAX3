@@ -5,7 +5,7 @@
 QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide the safer solution to update it:Download the packaged file to a USB drive and insert it into the machine for updating.  
 QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.  
 We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.
-## 4.3.4 Update content
+## 4.3.6 Update content
 1.Fixed an abnormal prompt bug that triggered material return detection during material return  
 2.Add a screen rest function. If the machine is not operated on a non printing interface, it will enter a screen stop state after 5 minutes.  
 3.Add a separate Z offset value function button.You can adjust the Z offset value before printing  
