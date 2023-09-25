@@ -35,7 +35,7 @@ You may be worried about why the max model has a plus model in the configuration
 <p align="left"><img src="other/blankname.png" height="360" alt="sample"></p>
 
 2. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
-<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.8/MAX3_V4.3.8.rar">Jump link </a>
+<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.8/MAX3_V4.3.8.rar">Jump link(The latest version 4.3.8) </a>
 3. Place the files in the USB drive, such as
 
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
