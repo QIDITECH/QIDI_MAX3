@@ -9,6 +9,23 @@ We have provided multiple different versions of source code. Please select the b
 1.Added factory reset  
 2.Selecting a file for printing through a network page can now display a preview image on the screen normally  
 ## Detailed update process
+#### Update Package File Selection
+We are equipped with two different probes for the Max model, one is a regular probe and the other is a Bltouch probe. Different types of probes require different configuration files.
+So we have placed configuration files suitable for two different probes in the upgrade package. You can freely choose to adapt to the configuration of the probe you are currently using, but this requires you to perform some operations on this upgrade package file. Don't worry, it is just a simple file operation, and we will provide a complete operation example here.  
+
+1. Download the latest upgrade package file and unzip it in the current folder, open the QD in it_ The Update folder, as shown in the figure below, shows two different configuration files inside, and you only need one of them.
+<p align="left"><img src="other/step1.png" height="60" alt="sample"></p>
+<p align="left"><img src="other/step2.png" height="60" alt="sample"></p>
+<p align="left"><img src="other/allfiles.png" height="180" alt="sample"></p>  
+
+2.Identify the type of probe you are using
+<p align="left"><img src="other/Probe.png" height="720" alt="sample"></p>
+<p align="left"><img src="other/Bltouch.png" height="720" alt="sample"></p>
+
+3.Keep only the configuration file of the corresponding probe, delete the other one, and rename the remaining one to 'printer. cfg'.
+As shown in the following figure, you can use this update package to update your machine
+<p align="left"><img src="other/finalfiles.png" height="180" alt="sample"></p>
+
 #### Packaged files
 1. Prepare a blank named USB drive.Please ensure that the device name of the USB drive is empty
 
@@ -21,7 +38,6 @@ We have provided multiple different versions of source code. Please select the b
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
 
 4. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
-
 
 
 
