@@ -26,6 +26,8 @@ So we have placed configuration files suitable for two different probes in the u
 As shown in the following figure, you can use this update package to update your machine
 <p align="left"><img src="other/finalfiles.png" height="180" alt="sample"></p>
 
+You may be worried about why the max model has a plus model in the configuration file. Please don't worry, this is for users who may have just reset the storage in the machine. The reset version will fall back to the ancient version, making it difficult to recognize the firmware with normal names. You don't need to worry about the existence of these files, which will affect your upgrade. The system will find the files it needs to update itself, The extra files will not have any impact on it.  
+
 #### Packaged files
 1. Prepare a blank named USB drive.Please ensure that the device name of the USB drive is empty
 
