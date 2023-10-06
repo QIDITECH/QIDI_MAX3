@@ -29,17 +29,14 @@ As shown in the following figure, you can use this update package to update your
 You may be worried about why the max model has a plus model in the configuration file. Please don't worry, this is for users who may have just reset the storage in the machine. The reset version will fall back to the ancient version, making it difficult to recognize the firmware with normal names. You don't need to worry about the existence of these files, which will affect your upgrade. The system will find the files it needs to update itself, The extra files will not have any impact on it.  
 
 #### Packaged files
-1. Prepare a blank named USB drive.Please ensure that the device name of the USB drive is empty
 
-<p align="left"><img src="other/blankname.png" height="360" alt="sample"></p>
-
-2. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
-<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.8/MAX3_V4.3.8.rar">Jump link </a>
-3. Place the files in the USB drive, such as
+1. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
+<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.10/MAX3_V4.3.10.rar">Jump link </a>
+2. Place the files in the USB drive, such as
 
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
 
-4. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
+3. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
 
 
 
