@@ -805,39 +805,26 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
                 page_to(TJC_PAGE_PRINTING);
                 jump_to_print = false;
             } else if (show_preview_complete == true) {        // 当且仅当预览加载完成才可以按下按钮
-                //3.1.0 CLL 修复页面跳转bug
-                printer_ready = false;
-                //2023.4.21-2 实现打印过文件标红
-                //printed_file_path = page_files_print_files_path;
-                show_preview_complete = false;
-                //3.1.0 CLL 删除X轴清理动画
-                //if (get_mks_total_printed_time() > 48000) {
-                //    page_to(TJC_PAGE_X_CLEAR_PLUS3);
-                //} else {
-                    if (get_filament_detected_enable() == true) {
-                        if (get_filament_detected() == true) {
-                            std::cout << "没有检测到断料" << std::endl;
-                            //3.1.3 CLL 打印前判断耗材种类并弹窗
-                            check_filament_type();
-                            //page_to(TJC_PAGE_PRINTING);
-                            printer_print_stats_state = "printing";
-                            print_start();
-                            start_printing(page_files_print_files_path);
-                        } else {
-                            std::cout << "检测到断料" << std::endl;
-                            page_to(TJC_PAGE_PRINT_F_POP);
-                        }
-                    } else {
+                //4.3.10 CLL 修改断料检测开关逻辑
+                if (get_mks_fila_status() == true) {
+                    if (get_filament_detected() == true) {
+                        check_filament_type();
+                        printer_print_stats_state = "printing";
+                        filament_sensor_switch(true);
                         print_start();
                         start_printing(page_files_print_files_path);
-                        printer_print_stats_state = "printing";
-                        //3.1.3 CLL 打印前判断耗材种类并弹窗
-                        check_filament_type();
-                        //page_to(TJC_PAGE_PRINTING);
+                    } else {
+                        std::cout << "检测到断料" << std::endl;
+                        page_to(TJC_PAGE_PRINT_F_POP);
                     }
-                //}
-                // clear_page_preview();
-                // show_preview_gimage_completed = false;
+                } else {
+                    print_start();
+                    start_printing(page_files_print_files_path);
+                    printer_print_stats_state = "printing";
+                    check_filament_type();
+                    //page_to(TJC_PAGE_PRINTING);
+                }
+                printer_ready = false;
                 show_preview_complete = false;
             }
             break;
@@ -2590,6 +2577,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
             page_to(TJC_PAGE_RESTORE_CONFIG);
             break;
 
+        //4.3.10 CLL 新增输出日志功能
+        case  TJC_PAGE_ABOUT_PRINT_LOG:
+            print_log();
+            break;
+
         default:
             break;
         }
@@ -2684,6 +2676,11 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         //4.3.7 CLL 新增恢复出厂设置功能
         case TJC_PAGE_NO_UPDATA_RESTORE:
             page_to(TJC_PAGE_RESTORE_CONFIG);
+            break;
+
+        //4.3.10 CLL 新增输出日志功能
+        case TJC_PAGE_NO_UPDATA_PRINT_LOG:
+            print_log();
             break;
 
         default:
@@ -2925,6 +2922,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         default:
             break;
         }
+        break;
 
     case TJC_PAGE_SAVING:
         break;
@@ -3365,6 +3363,7 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
                 get_object_status();
             } else {
                 page_to(previous_page_id);
+                get_object_status();
             }
             if (previous_caselight_value == true) {
                 led_on_off();
@@ -3392,6 +3391,47 @@ void tjc_event_clicked_handler(int page_id, int widget_id, int type_id) {
         default:
             break;
         }
+        break;
+
+    //4.3.10 CLL 新增输出日志功能
+    case TJC_PAGE_PRINT_LOG_S:
+    case TJC_PAGE_PRINT_LOG_F:
+        switch(widget_id)
+        {
+        case TJC_PAGE_PRINT_LOG_YES:
+            go_to_about();
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    //4.3.10 CLL 新增共振补偿超时强制跳转
+    case TJC_PAGE_OPEN_SYNTONY:
+        switch (widget_id)
+        {
+        case TJC_PAGE_OPEN_SYNTONY_JUMP_OUT:
+            send_gcode("SAVE_CONFIG\n");
+            page_to(TJC_PAGE_SYNTONY_FINISH);
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case TJC_PAGE_SYNTONY_MOVE:
+        switch (widget_id)
+        {
+        case TJC_PAGE_SYNTONY_MOVE_JUMP_OUT:
+            send_gcode("SAVE_CONFIG\n");
+            page_to(TJC_PAGE_SYNTONY_FINISH);
+            break;
+
+        default:
+            break;
+        }   
         break;
 
     default:

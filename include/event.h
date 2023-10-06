@@ -251,4 +251,13 @@ std::string replaceCharacters(const std::string& path, const std::string& search
 void restore_config();
 void refresh_page_restoring();
 
+//4.3.10 新增输出日志文件功能
+void print_log();
+
+//4.3.10 CLL 修改断料检测开关逻辑
+void filament_sensor_switch(bool status);
+
+//4.3.10 CLL 新增共振补偿超时强制跳转
+void send_gcode(std::string command);
+
 #endif

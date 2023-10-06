@@ -33,6 +33,8 @@
 #define TJC_PAGE_OPEN_LEVELED_FINISH        0x02
 
 #define TJC_PAGE_OPEN_SYNTONY               6
+//4.3.10 CLL 新增共振补偿超时强制跳转
+#define TJC_PAGE_OPEN_SYNTONY_JUMP_OUT      0x00
 
 #define TJC_PAGE_OPEN_FILAMENT_1            7       // 作废
 #define TJC_PAGE_OPEN_FILAMENT_1_NEXT       0x02    // 作废
@@ -350,6 +352,8 @@
 #define TJC_PAGE_SET_ZOFFSET_B16            0x16
 
 #define TJC_PAGE_SYNTONY_MOVE               42
+//4.3.10 CLL 新增共振补偿超时强制跳转
+#define TJC_PAGE_SYNTONY_MOVE_JUMP_OUT      0x00
 
 #define TJC_PAGE_SYNTONY_FINISH             43
 
@@ -445,6 +449,8 @@
 #define TJC_PAGE_ABOUT_OOBE                 0x0e
 //4.3.7 CLL 新增恢复出厂设置按钮
 #define TJC_PAGE_ABOUT_RESTORE              0x0f
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_ABOUT_PRINT_LOG            0x10
 
 #define TJC_PAGE_PRINT_F_POP                53
 #define TJC_PAGE_PRINT_F_POP_YES            0x02
@@ -506,6 +512,8 @@
 #define TJC_PAGE_NO_UPDATA_OOBE             0x0e
 //4.3.7 CLL 新增恢复出厂设置按钮
 #define TJC_PAGE_NO_UPDATA_RESTORE          0x0f
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_NO_UPDATA_PRINT_LOG        0x10
 
 #define TJC_PAGE_KEYDBA                     51
 #define TJC_PAGE_KEYDBA_HOME                0x2c
@@ -677,6 +685,11 @@
 #define TJC_PAGE_RESTORE_CONFIG_NO         0x01
 
 #define TJC_PAGE_RESTORING                 118
+
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_PRINT_LOG_S               119
+#define TJC_PAGE_PRINT_LOG_F               120
+#define TJC_PAGE_PRINT_LOG_YES             0x00
 
 #endif
 

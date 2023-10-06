@@ -390,6 +390,10 @@ void refresh_page_show() {
             if (printer_print_stats_state == "printing") {
                 if (printer_print_stats_filename != "") {
                     sleep(5);
+                    //4.3.10 CLL 修改断料检测开关逻辑
+                    if (get_mks_fila_status() == true) {
+                        filament_sensor_switch(true);
+                    }
                     MKSLOG_BLUE("跳入到打印函数\n");
                     //4.3.6 CLL 新增息屏功能
                     if (previous_caselight_value == true) {
@@ -1021,7 +1025,7 @@ void refresh_page_syntony_finish() {
     MKSLOG_BLUE("Printer webhooks state: %s", printer_webhooks_state.c_str());
     if (page_syntony_finished == false) {
         page_syntony_finished = true;
-        ep->Send(json_run_a_gcode("SAVE_CONFIG"));
+        //ep->Send(json_run_a_gcode("SAVE_CONFIG"));
         all_level_saving = false;
     }
     
@@ -1148,7 +1152,8 @@ void refresh_page_about() {
 
 //4.3.6 CLL 修复UI按下效果
 void refresh_page_auto_level() {
-    send_cmd_txt(tty_fd, "t1", std::to_string(printer_gcode_move_homing_origin[2]).substr(0,5) + "mm");
+    //4.3.10 CLL 调平页面显示zoffset值为最终值
+    send_cmd_txt(tty_fd, "t1", std::to_string(printer_gcode_move_homing_origin[2] - 0.15).substr(0,5) + "mm");
     if (auto_level_dist == (float)0.01) {
         send_cmd_picc(tty_fd, "b3", "95");
         send_cmd_picc2(tty_fd, "b3", "317");
@@ -1206,7 +1211,8 @@ void refresh_page_stopping() {
 
 //4.3.6 CLL 新增设置Z轴偏移页面
 void refresh_page_set_zoffset_2() {
-    send_cmd_txt(tty_fd, "t1", std::to_string(printer_gcode_move_homing_origin[2]).substr(0,5) + "mm");
+    //4.3.10 CLL 调平页面显示zoffset值为最终值
+    send_cmd_txt(tty_fd, "t1", std::to_string(printer_gcode_move_homing_origin[2] - 0.15).substr(0,5) + "mm");
     if (auto_level_dist == (float)0.01) {
         send_cmd_picc(tty_fd, "b3", "95");
         send_cmd_picc2(tty_fd, "b3", "317");
@@ -1447,6 +1453,10 @@ void refresh_page_print_filament() {
     if (printer_print_stats_state == "printing") {
         if (printer_ready == true) {
             printer_ready = false;
+            //4.3.10 CLL 修改断料检测开关逻辑
+            if (get_mks_fila_status() == true) {
+                filament_sensor_switch(true);
+            }
             page_to(TJC_PAGE_PRINTING);
         }
     }
@@ -1835,7 +1845,9 @@ void refresh_page_filament() {
             send_cmd_picc2(tty_fd, "b3", "417");
         }
 
-        if (filament_switch_sensor_fila_enabled == true) {
+        //4.3.10 CLL 修改断料检测开关逻辑
+        if (mks_fila_status == true) {
+        //if (filament_switch_sensor_fila_enabled == true) {
             send_cmd_picc(tty_fd, "b5", "418");
             send_cmd_picc2(tty_fd, "b5", "417");
         } else {
@@ -1910,12 +1922,14 @@ void refresh_page_printing_zoffset() {
     if (printer_print_stats_state == "paused") {
         if (printer_ready == true) {
             printer_ready = false;
+            filament_sensor_switch(false);
             page_to(TJC_PAGE_PRINT_FILAMENT);
         }
     }
 
     if (printer_print_stats_state == "complete") {
         if (level_mode_printing_is_printing_level == false) {
+            filament_sensor_switch(false);
             complete_print();
             //3.1.2 CLL 修复网页显示预览图bug
             clear_previous_data();
@@ -1933,12 +1947,14 @@ void refresh_page_printing_zoffset() {
 
     //3.1.0 CLL 报错弹窗
     if (printer_print_stats_state == "error") {
+        filament_sensor_switch(false);
         page_to(TJC_PAGE_GCODE_ERROR);
         send_cmd_txt(tty_fd, "t0", "gcode error:" + output_console);
     }
 
     //3.1.0 CLL 网页停止后将跳转至打印停止界面
     if (printer_print_stats_state == "standby") {
+        filament_sensor_switch(false);
         page_to(TJC_PAGE_STOPPING);
     }
     //3.1.0 CLL 在打印设置zoffset界面也会有断料提醒弹窗
@@ -2132,12 +2148,14 @@ void refresh_page_printing() {
     }
     if (printer_print_stats_state == "paused") {
         if (printer_ready == true) {
+            filament_sensor_switch(false);
             printer_ready = false;
             page_to(TJC_PAGE_PRINT_FILAMENT);
         }
     }
 
     if (printer_print_stats_state == "complete") {
+        filament_sensor_switch(false);
         complete_print();
         //3.1.2 CLL 修复网页显示预览图bug
         clear_previous_data();
@@ -2153,10 +2171,12 @@ void refresh_page_printing() {
     if (printer_print_stats_state == "error") {
         page_to(TJC_PAGE_GCODE_ERROR);
         send_cmd_txt(tty_fd, "t0", "gcode error:" + output_console);
+        filament_sensor_switch(false);
     }
 
     //3.1.0 CLL 网页停止后将跳转至打印停止界面
     if (printer_print_stats_state == "standby") {
+        filament_sensor_switch(false);
         page_to(TJC_PAGE_STOPPING);
     }
 
@@ -2636,11 +2656,11 @@ void move_y_increase() {
 }
 
 void move_z_decrease() {
-    ep->Send(move(AXIS_Z, "-" + std::to_string(printer_move_dist), 130));
+    ep->Send(move(AXIS_Z, "-" + std::to_string(printer_move_dist), 10));
 }
 
 void move_z_increase() {
-    ep->Send(move(AXIS_Z, "+" + std::to_string(printer_move_dist), 130));
+    ep->Send(move(AXIS_Z, "+" + std::to_string(printer_move_dist), 10));
 }
 
 bool get_filament_detected() {
@@ -2664,6 +2684,7 @@ void set_print_pause_resume() {
 }
 
 void set_print_pause() {
+    filament_sensor_switch(false);
     ep->Send(json_run_a_gcode("PAUSE"));
     // printer_pause_taget = printer_extruder_target;
     // ep->Send(json_run_a_gcode("G1 Z10\n"));
@@ -2672,12 +2693,16 @@ void set_print_pause() {
 }
 
 void set_print_resume() {
+    if (get_mks_fila_status() == true) {
+        filament_sensor_switch(true);
+    }
     ep->Send(json_run_a_gcode("RESUME"));
     // set_extruder_target(printer_pause_taget);
     // printer_pause_taget = 0;
 }
 
 void cancel_print() {
+    filament_sensor_switch(false);
     printer_print_stats_filename = "";
     clear_cp0_image();
     /* 执行这个避免一直加热 */
@@ -2687,6 +2712,7 @@ void cancel_print() {
     // ep->Send(json_run_a_gcode("M220 S100"));
     // ep->Send(json_run_a_gcode("M221 S100"));
     /* 执行这个避免一直加热 */
+    filament_sensor_switch(false);
     ep->Send(json_run_a_gcode("CANCEL_PRINT"));
     // std::cout << "Total time: " << get_cal_printed_time(total_print_time) << std::endl;
     int printed_minutes = get_cal_printed_time((int)(printer_print_stats_print_duration));
@@ -2780,7 +2806,7 @@ void finish_auto_level() {
         // ep->Send(json_run_a_gcode("G1 X0 Y0 F6000\nSAVE_CONFIG\n"));
         // ep->Send(json_run_a_gcode("G1 X0 Y0 F6000\nG91\nG1 Z200\nG90\nM1029\nSAVE_CONFIG"));
         //4.3.3 CLL 修改调平完成后平台移动
-        ep->Send(json_run_a_gcode("G0 Z50 F600\nG1 X0 Y0 G9000\nM1029\nSAVE_CONFIG"));
+        ep->Send(json_run_a_gcode("G0 Z50 F600\nG1 X0 Y0 G9000\nSAVE_CONFIG"));
         // ep->Send(json_run_a_gcode("SAVE_CONFIG\nBED_MESH_PROFILE LOAD=\"name\"\n"));
         all_level_saving = false;
         // sleep(7);
@@ -3053,14 +3079,16 @@ void finish_print() {
     page_to(TJC_PAGE_MAIN);
 }
 
+//4.3.10 CLL 修改断料检测开关逻辑
 void set_filament_sensor() {
     std::cout << "filament_switch_sensor fila = " << filament_switch_sensor_fila_enabled << std::endl; 
-    if (filament_switch_sensor_fila_enabled == 0) {
-        ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=1\n"));
+    if (mks_fila_status == false) {
+    //if (filament_switch_sensor_fila_enabled == 0) {
+        //ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=1\n"));
         mks_fila_status = true;
         set_mks_fila_status();
     } else {
-        ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=0\n"));
+        //ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=0\n"));
         mks_fila_status = false;
         set_mks_fila_status();
     }
@@ -3081,11 +3109,11 @@ void beep_on_off() {
     if (printer_out_pin_beep_value == 0) {
         ep->Send(json_run_a_gcode("beep_on"));
         mks_beep_status = true;
-        set_mks_beep_status();
+        //set_mks_beep_status();
     } else {
         ep->Send(json_run_a_gcode("beep_off"));
         mks_beep_status = false;
-        set_mks_beep_status();
+        //set_mks_beep_status();
     }
 }
 
@@ -3093,13 +3121,13 @@ void led_on_off() {
     if (printer_caselight_value == 0) {
         ep->Send(json_run_a_gcode("SET_PIN PIN=caselight VALUE=1"));
         mks_led_status = true;
-        set_mks_led_status();
+        //set_mks_led_status();
     } else {
         ep->Send(json_run_a_gcode("SET_PIN PIN=caselight VALUE=0"));
         //4.3.8 CLL 息屏不保存状态
         if (previous_caselight_value == false) {
             mks_led_status = false;
-            set_mks_led_status();
+            //set_mks_led_status();
         }
     }
 }
@@ -3558,7 +3586,10 @@ void init_mks_status() {
     get_mks_total_printed_time();
     get_mks_babystep();
     printer_set_babystep();
-    if (get_mks_beep_status() == 0) {
+    //4.3.10 开机自动设置声音关、灯开、断料检测关
+    ep->Send(json_run_a_gcode("beep_off\nSET_PIN PIN=caselight VALUE=1\nSET_FILAMENT_SENSOR SENSOR=fila ENABLE=0\n"));
+    /*
+        if (get_mks_beep_status() == 0) {
 		MKSLOG_RED("关闭蜂鸣器");
 		if (get_mks_led_status() == 0) {
 			MKSLOG_BLUE("关掉LED灯");
@@ -3601,6 +3632,7 @@ void init_mks_status() {
 			}
 		}
 	}
+    */
 }
 
 void after_scan_refresh_page() {
@@ -3782,7 +3814,7 @@ void open_go_to_syntony_move() {
     page_syntony_finished = false;
     printer_idle_timeout_state = "Printing";
     page_to(TJC_PAGE_OPEN_SYNTONY);
-    ep->Send(json_run_a_gcode("M1029\nM901\n"));
+    ep->Send(json_run_a_gcode("M901\n"));
 }
 
 void move_motors_off() {
@@ -3797,7 +3829,7 @@ void open_syntony_finish() {
     MKSLOG_BLUE("Printer webhooks state: %s", printer_webhooks_state.c_str());
     if (page_syntony_finished == false) {
         page_syntony_finished = true;
-        ep->Send(json_run_a_gcode("SAVE_CONFIG"));
+        //ep->Send(json_run_a_gcode("SAVE_CONFIG"));
     }
 
     if (printer_idle_timeout_state == "Ready" && printer_webhooks_state == "ready") {
@@ -3867,7 +3899,8 @@ void open_start_extrude() {
 
 void open_null_2_enter() {
     printer_idle_timeout_state = "Printing";
-    ep->Send(json_run_a_gcode("G91\nG1 Z-150 F300\nG1 X-100 Y-100 F1200\nG90"));
+    //4.3.10 CLL 修改开机引导平台上移距离
+    ep->Send(json_run_a_gcode("G91\nG1 Z-130 F300\nG1 X-100 Y-100 F1200\nG90"));
 }
 
 void open_more_level_finish() {
@@ -4147,13 +4180,41 @@ void refresh_page_open_level() {
 //4.3.7 CLL 新增恢复出厂设置功能
 void restore_config() {
     system("cp /home/mks/klipper_config/config.mksini.bak /home/mks/klipper_config/config.mksini");
-    ep->Send(json_run_a_gcode("BED_MESH_PROFILE REMOVE=\"default\"\nSAVE_CONFIG"));
-    sleep(1);
-    page_to(TJC_PAGE_RESTORING);
+    //ep->Send(json_run_a_gcode("BED_MESH_PROFILE REMOVE=\"default\"\nSAVE_CONFIG"));
+    //sleep(1);
+    //page_to(TJC_PAGE_RESTORING);
+    //4.3.10 CLL 恢复出厂设置时不再清空热床调平数据
+    page_to(TJC_PAGE_MAIN);
 }
 
 void refresh_page_restoring() {
     if (printer_idle_timeout_state == "Ready" && printer_webhooks_state == "ready") {
         page_to(TJC_PAGE_MAIN);
     }
+}
+
+//4.3.10 CLL 新增输出日志文件功能
+void print_log() {
+    if (detect_disk() == -1) {
+        page_to(TJC_PAGE_PRINT_LOG_F);
+    } else {
+        system("mkdir /home/mks/gcode_files/sda1/QD_Log");
+        system("cp /home/mks/klipper_logs/klippy.log /home/mks/gcode_files/sda1/QD_Log/klippy.log\n");
+        system("cp /home/mks/klipper_logs/moonraker.log /home/mks/gcode_files/sda1/QD_Log/moonraker.log\n");
+        page_to(TJC_PAGE_PRINT_LOG_S);
+    }
+}
+
+//4.3.10 CLL 修改断料开关检测逻辑
+void filament_sensor_switch(bool status) {
+    if (status == true) {
+        ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=1\n"));
+    } else if (status == false) {
+        ep->Send(json_run_a_gcode("SET_FILAMENT_SENSOR SENSOR=fila ENABLE=0\n"));
+    }
+}
+
+//4.3.10 CLL 新增共振补偿超时强制跳转
+void send_gcode(std::string command) {
+    ep->Send(json_run_a_gcode(command));
 }

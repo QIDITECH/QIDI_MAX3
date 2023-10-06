@@ -59,6 +59,8 @@ void parse_gcode_response(nlohmann::json params) {
         if (params0 == "// Klipper state: Ready") {
             MKSLOG("重启Klipper已准备就绪，发送订阅内容");
             printer_webhooks_state = "ready";
+            //4.3.10 CLL 修复页面卡住问题
+            printer_idle_timeout_state = "Ready";
             printer_webhooks_state_message = "Klipper state: Ready";
             // if (all_level_saving == false) {
             sleep(5);
