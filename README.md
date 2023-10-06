@@ -5,9 +5,16 @@
 QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide the safer solution to update it:Download the packaged file to a USB drive and insert it into the machine for updating.  
 QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.  
 We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.
-## 4.3.8 Update content
-1.Added factory reset  
-2.Selecting a file for printing through a network page can now display a preview image on the screen normally  
+## 4.3.10 Update content
+1. Optimized the logic of material breakage detection
+
+2. Optimized page jump logic after resonance
+
+3. Added the function of exporting logs
+
+4. Revise and reset the factory settings function
+
+5. Adjusted the rising distance during boot up guidance
 ## Detailed update process
 #### Update Package File Selection
 We are equipped with two different probes for the Max model, one is a regular probe and the other is a Bltouch probe. Different types of probes require different configuration files.
