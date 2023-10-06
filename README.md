@@ -17,6 +17,8 @@ We have provided multiple different versions of source code. Please select the b
 5. Adjusted the rising distance during boot up guidance
 ## Detailed update process
 #### Update Package File Selection
+Note that all updates cannot be updated from higher versions  
+
 We are equipped with two different probes for the Max model, one is a regular probe and the other is a Bltouch probe. Different types of probes require different configuration files.
 So we have placed configuration files suitable for two different probes in the upgrade package. You can freely choose to adapt to the configuration of the probe you are currently using, but this requires you to perform some operations on this upgrade package file. Don't worry, it is just a simple file operation, and we will provide a complete operation example here.  
 
