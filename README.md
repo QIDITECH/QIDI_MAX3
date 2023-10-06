@@ -4,11 +4,17 @@
 # Document Instructions
 QIDI_Max3 is a server-side software that interacts with the screen in the Maxx3 model system. This document contains our source code, and we provide the safer solution to update it:Download the packaged file to a USB drive and insert it into the machine for updating.  
 QIDI provides a packaged version file in the version bar next to it. Please download the compressed package file starting with MAX.  
-We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.  
-Please note that the README.me file in the main branch will be synchronized with the latest version, making it easier for you to see the latest updates you need.
-## 4.3.8 Update content
-1.Added factory reset  
-2.Selecting a file for printing through a network page can now display a preview image on the screen normally  
+We have provided multiple different versions of source code. Please select the branch you want to download, and the name of the branch is the corresponding version name.
+## 4.3.10 Update content
+1. Optimized the logic of material breakage detection
+
+2. Optimized page jump logic after resonance
+
+3. Added the function of exporting logs
+
+4. Revise and reset the factory settings function
+
+5. Adjusted the rising distance during boot up guidance
 ## Detailed update process
 #### Update Package File Selection
 We are equipped with two different probes for the Max model, one is a regular probe and the other is a Bltouch probe. Different types of probes require different configuration files.
@@ -30,17 +36,14 @@ As shown in the following figure, you can use this update package to update your
 You may be worried about why the max model has a plus model in the configuration file. Please don't worry, this is for users who may have just reset the storage in the machine. The reset version will fall back to the ancient version, making it difficult to recognize the firmware with normal names. You don't need to worry about the existence of these files, which will affect your upgrade. The system will find the files it needs to update itself, The extra files will not have any impact on it.  
 
 #### Packaged files
-1. Prepare a blank named USB drive.Please ensure that the device name of the USB drive is empty
 
-<p align="left"><img src="other/blankname.png" height="360" alt="sample"></p>
-
-2. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
-<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.8/MAX3_V4.3.8.rar">Jump link(The latest version 4.3.8) </a>
-3. Place the files in the USB drive, such as
+1. Select the latest version in the version release bar next to it, download the compressed file package starting with MAX and extract it locally.  
+<a href="https://github.com/QIDITECH/QIDI_MAX3/releases/tag/Max3_V4.3.10/MAX3_V4.3.10.rar">Jump link </a>
+2. Place the files in the USB drive, such as
 
 <p align="left"><img src="other/sample.png" height="240" alt="sample"></p>
 
-4. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
+3. Insert the USB drive into the machine's USB interface, and an update prompt will appear on the version information interface. Click the update button to restart according to the prompt.
 
 
 
