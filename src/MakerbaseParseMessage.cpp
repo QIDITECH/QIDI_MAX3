@@ -16,6 +16,7 @@
 // #include "../include/file.h"
 // #include "../include/job.h"
 // #include "../include/tjc_event.h"
+#include "../include/ui.h"
 
 extern MakerbaseClient *ep;
 
@@ -30,6 +31,11 @@ nlohmann::json res;
 extern bool filelist_changed;
 
 extern bool all_level_saving;
+
+//4.3.7 CLL 修改网页打印信息订阅
+extern bool jump_to_print;
+extern nlohmann::json output_metadata;
+extern int current_page_id;
 
 void *json_parse(void *arg) {
     while (1) {
@@ -51,8 +57,11 @@ void *json_parse(void *arg) {
                 switch (id)
                 {
                 case 3545:
-                    std::cout << response << std::endl;
-                    parse_file_estimated_time(response);
+                //4.3.7 CLL 修改网页打印信息订阅
+                    if (jump_to_print == false) {
+                        std::cout << response << std::endl;
+                        parse_file_estimated_time(response);
+                    }
                     break;
 
                 case 4654:
@@ -148,8 +157,19 @@ void *json_parse(void *arg) {
                         // MKSLOG_RED("%s", message.data());
                         //3.1.0 CLL 使网页打印显示预览图
                         //std::cout << response << std::endl;
-                        parse_file_estimated_time_send(response["params"][0]["job"]["metadata"]);
-                        MKSLOG_BLUE("历史改变");
+                        //4.3.7 CLL 修改网页打印信息订阅
+                        switch (current_page_id)
+                        {
+                        case TJC_PAGE_PRINTING:
+                        case TJC_PAGE_PRINT_ZOFFSET:
+                        case TJC_PAGE_PRINT_FILAMENT:
+                            break;
+                        
+                        default:
+                            parse_file_estimated_time_send(response["params"][0]["job"]["metadata"]);
+                            MKSLOG_BLUE("历史改变");
+                            break;
+                        }
                     } else if (method == "notify_user_created") {
                         MKSLOG_BLUE("授权用户创建");
                     } else if (method == "notify_user_deleted") {

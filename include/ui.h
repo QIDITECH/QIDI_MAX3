@@ -33,6 +33,8 @@
 #define TJC_PAGE_OPEN_LEVELED_FINISH        0x02
 
 #define TJC_PAGE_OPEN_SYNTONY               6
+//4.3.10 CLL 新增共振补偿超时强制跳转
+#define TJC_PAGE_OPEN_SYNTONY_JUMP_OUT      0x00
 
 #define TJC_PAGE_OPEN_FILAMENT_1            7       // 作废
 #define TJC_PAGE_OPEN_FILAMENT_1_NEXT       0x02    // 作废
@@ -82,6 +84,8 @@
 #define TJC_PAGE_OPEN_VIDEO_3_EXTRUDE       0x01
 
 #define TJC_PAGE_OPEN_VIDEO_4               90
+#define TJC_PAGE_OPEN_VIDEO_4_UP            0x00
+#define TJC_PAGE_OPEN_VIDEO_4_DOWN          0x01
 #define TJC_PAGE_OPEN_VIDEO_4_PREVIOUS      0x02
 #define TJC_PAGE_OPEN_VIDEO_4_NEXT          0x03
 
@@ -194,9 +198,11 @@
 #define TJC_PAGE_PRINT_FILAMENT_RETRACT     0x06
 #define TJC_PAGE_PRINT_FILAMENT_EXTRUDE     0x07
 #define TJC_PAGE_PRINT_FILAMENT_10          0x03
-#define TJC_PAGE_PRINT_FILAMENT_20          0x04
-#define TJC_PAGE_PRINT_FILAMENT_50          0x05
+#define TJC_PAGE_PRINT_FILAMENT_50          0x04
+#define TJC_PAGE_PRINT_FILAMENT_100         0x05
 #define TJC_PAGE_PRINT_FILAMENT_TARGET      0x0a
+#define TJC_PAGE_PRINT_FILAMENT_LOAD        0x0b
+#define TJC_PAGE_PRINT_FILAMENT_UNLOAD      0x0c
 
 #define TJC_PAGE_MOVE                       22
 #define TJC_PAGE_MOVE_FILAMENT              0x0d
@@ -239,8 +245,8 @@
 #define TJC_PAGE_FILAMENT_BTN_SERVICE       0x0f
 #define TJC_PAGE_FILAMENT_UNLOAD            0x15
 #define TJC_PAGE_FILAMENT_BTN_10            0x1e
-#define TJC_PAGE_FILAMENT_BTN_20            0x1f
-#define TJC_PAGE_FILAMENT_BTN_50            0x20
+#define TJC_PAGE_FILAMENT_BTN_50            0x1f
+#define TJC_PAGE_FILAMENT_BTN_100           0x20
 #define TJC_PAGE_FILAMENT_BTN_RETRACT       0x16
 #define TJC_PAGE_FILAMENT_BTN_EXTRUDE       0x17
 #define TJC_PAGE_FILAMENT_BTN_EXTRUDER      0x22
@@ -254,6 +260,7 @@
 #define TJC_PAGE_FILAMENT_EXTRUDER          0x11
 #define TJC_PAGE_FILAMENT_HEATER_BED        0x12
 #define TJC_PAGE_FILAMENT_HOT               0x13
+#define TJC_PAGE_FILAMENT_LOAD              0x18
 
 #define TJC_PAGE_FILAMENT_BTN_STOP          0x21
 
@@ -286,7 +293,6 @@
 #define TJC_PAGE_LEVEL_MODE_AUTO_LEVEL      0x09
 #define TJC_PAGE_LEVEL_MODE_MANUAL_LEVEL    0x0b
 #define TJC_PAGE_LEVEL_MODE_SET_ZOFFSET     0x0a
-#define TJC_PAGE_LEVEL_MODE_CALIBRATION     0x0a
 #define TJC_PAGE_LEVEL_MODE_SYNTONY_MOVE    0x0c
 #define TJC_PAGE_LEVEL_MODE_PID             0x0d
 
@@ -351,6 +357,8 @@
 #define TJC_PAGE_SET_ZOFFSET_B16            0x16
 
 #define TJC_PAGE_SYNTONY_MOVE               42
+//4.3.10 CLL 新增共振补偿超时强制跳转
+#define TJC_PAGE_SYNTONY_MOVE_JUMP_OUT      0x00
 
 #define TJC_PAGE_SYNTONY_FINISH             43
 
@@ -444,6 +452,10 @@
 #define TJC_PAGE_ABOUT_RESET                0x0a
 #define TJC_PAGE_ABOUT_UPDATE               0x0c
 #define TJC_PAGE_ABOUT_OOBE                 0x0e
+//4.3.7 CLL 新增恢复出厂设置按钮
+#define TJC_PAGE_ABOUT_RESTORE              0x0f
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_ABOUT_PRINT_LOG            0x10
 
 #define TJC_PAGE_PRINT_F_POP                53
 #define TJC_PAGE_PRINT_F_POP_YES            0x02
@@ -466,8 +478,8 @@
 
 #define TJC_PAGE_SET_ZOFFSET_2              54
 #define TJC_PAGE_SET_ZOFFSET_2_001          0x02
-#define TJC_PAGE_SET_ZOFFSET_2_0025         0x03
-#define TJC_PAGE_SET_ZOFFSET_2_005          0x04
+#define TJC_PAGE_SET_ZOFFSET_2_005          0x03
+#define TJC_PAGE_SET_ZOFFSET_2_01           0x04
 #define TJC_PAGE_SET_ZOFFSET_2_1            0x09
 #define TJC_PAGE_SET_ZOFFSET_2_UP           0x05
 #define TJC_PAGE_SET_ZOFFSET_2_DOWN         0x06
@@ -503,6 +515,10 @@
 #define TJC_PAGE_NO_UPDATA_SERVICE          0x02
 #define TJC_PAGE_NO_UPDATA_RESET            0x09
 #define TJC_PAGE_NO_UPDATA_OOBE             0x0e
+//4.3.7 CLL 新增恢复出厂设置按钮
+#define TJC_PAGE_NO_UPDATA_RESTORE          0x0f
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_NO_UPDATA_PRINT_LOG        0x10
 
 #define TJC_PAGE_KEYDBA                     51
 #define TJC_PAGE_KEYDBA_HOME                0x2c
@@ -609,6 +625,10 @@
 
 #define TJC_PAGE_FILAMENT_SHOWDOWN          97
 
+#define TJC_PAGE_UNLOAD_FINISH              98
+#define TJC_PAGE_UNLOAD_FINISH_YES          0x00
+#define TJC_PAGE_UNLOAD_FINISH_RELOAD       0x01
+
 #define TJC_PAGE_SAVING_2                   101
 
 #define TJC_PAGE_FILAMENT_POP_4             104
@@ -658,10 +678,42 @@
 
 //3.1.3 CLL 打印前判断耗材种类并弹窗
 #define TJC_PAGE_PREVIEW_POP_1               114
-#define TJC_PAGE_PREVIEW_POP_1_YES           0x00
-
 #define TJC_PAGE_PREVIEW_POP_2               115
-#define TJC_PAGE_PREVIEW_POP_2_YES           0x00
+#define TJC_PAGE_PREVIEW_POP_YES             0x00
+//4.3.4 CLL 耗材确认弹窗新增不再提示按钮
+#define TJC_PAGE_PREVIEW_POP_NO_POP        0x01
+
+//4.3.6 CLL 新增息屏功能
+#define TJC_PAGE_SCREEN_SLEEP              116
+#define TJC_PAGE_SCREEN_SLEEP_ENTER        0x00
+#define TJC_PAGE_SCREEN_SLEEP_EXIT         0x01
+
+//4.3.7 CLL 新增恢复出厂设置按钮             
+#define TJC_PAGE_RESTORE_CONFIG            117
+#define TJC_PAGE_RESTORE_CONFIG_YES        0x00
+#define TJC_PAGE_RESTORE_CONFIG_NO         0x01
+
+#define TJC_PAGE_RESTORING                 118
+
+//4.3.10 CLL 新增输出日志文件功能
+#define TJC_PAGE_PRINT_LOG_S               119
+#define TJC_PAGE_PRINT_LOG_F               120
+#define TJC_PAGE_PRINT_LOG_YES             0x00
+
+// CLL 新增进料功能
+#define TJC_PAGE_LOADING                   121
+
+#define TJC_PAGE_LOAD_FINISH              122
+#define TJC_PAGE_LOAD_FINISH_YES          0x00
+#define TJC_PAGE_LOAD_FINISH_RETRY        0x01
+
+#define TJC_PAGE_PRE_UNLOAD               123
+#define TJC_PAGE_PRE_UNLOAD_NEXT          0x00
+
+#define TJC_PAGE_MEMORY_WARNING           124
+#define TJC_PAGE_MEMORY_WARNING_YES       0x00
+
+#define TJC_PAGE_UPDATING                 125
 
 #endif
 

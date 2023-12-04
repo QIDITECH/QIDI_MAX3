@@ -1,5 +1,6 @@
 #include "../include/KlippyRest.h"
 #include "../include/mks_log.h"
+#include "../include/event.h"
 
 std::string server_files_metadata(std::string ip, std::string port, std::string filename) {
     return send_request(ip, port, "server/files/metadata?filename=" + filename, "GET");
@@ -64,6 +65,10 @@ std::string get_thumbnail_stream(std::string ip, std::string port, std::string t
 std::string send_request(std::string ip, std::string port, std::string method, std::string request_type) {
     std::string url = "http://" + ip + ":" + port + "/" + method;
     std::string str_response = "";
+
+    //4.3.2 CLL 修复无法读取文件名中有空格文件
+    url=replaceCharacters(url," ","%20");
+
     MKSLOG_BLUE("Sending request to %s", url.data());
     try
     {
