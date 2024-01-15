@@ -200,8 +200,10 @@ void *monitor_GPIO1_B2(void *arg) {
             if ((val - '0') == 0) {
                 // 检测到低电平之后要执行的
                 // set_GPIO1_C5_low();
+                //4.3.7 CLL 关机时自动保存
+                //4.3.5 CLL 屏蔽关机页面
                 system("echo TEST > /root/TESTGPIO; sync");
-                go_to_page_power_off();
+                //go_to_page_power_off();
                 system("sync; shutdown -h now;");
             }
         }
