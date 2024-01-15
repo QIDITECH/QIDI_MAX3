@@ -160,6 +160,7 @@ void wifi_save_config();
 void disable_page_about_successed();
 void finish_tjc_update();
 void filament_unload();
+void filament_load();
 int get_cal_printed_time(int print_time);
 
 int get_mks_total_printed_time();
@@ -240,5 +241,28 @@ void save_current_zoffset();
 void check_filament_type();
 
 void refresh_page_preview_pop();
+
+//4.3.6 CLL 修复UI按下效果
+void refresh_page_open_level();
+
+//4.3.2 CLL 修复无法读取文件名中有空格文件
+std::string replaceCharacters(const std::string& path, const std::string& searchChars, const std::string& replacement);
+
+//4.3.7 CLL 新增恢复出厂设置功能
+void restore_config();
+void refresh_page_restoring();
+
+//4.3.10 新增输出日志文件功能
+void print_log();
+
+//4.3.10 CLL 修改断料检测开关逻辑
+void filament_sensor_switch(bool status);
+
+//4.3.10 CLL 新增共振补偿超时强制跳转
+void send_gcode(std::string command);
+
+void refresh_page_loading();
+
+void refresh_page_pre_heating_2();
 
 #endif
