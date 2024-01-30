@@ -27,9 +27,12 @@ Note that all updates cannot be updated from higher versions
 We are equipped with two different probes for the Max model, one is a regular probe and the other is a Bltouch probe. Different types of probes require different configuration files.
 So we have placed configuration files suitable for two different probes in the upgrade package. You can freely choose to adapt to the configuration of the probe you are currently using, but this requires you to perform some operations on this upgrade package file. Don't worry, it is just a simple file operation, and we will provide a complete operation example here.
 
-1. Download the latest upgrade package file and unzip it in the current folder, open the QD in it\_ The Update folder, as shown in the figure below, shows two different configuration files inside, and you only need one of them.
+1. Download the latest upgrade package file and unzip it in the current folder. There is a QD_Update in the extracted folder. (Recent version will not have QD_factory_mode.txt in it)
 <p align="left"><img src="other/step1.png" height="60" alt="sample"></p>
 <p align="left"><img src="other/step2.png" height="60" alt="sample"></p>
+
+Open the QD_Update folder, as shown in the figure below, shows two different configuration files inside, and you only need one of them.
+
 <p align="left"><img src="other/allfiles.png" height="180" alt="sample"></p>
 
 2.Identify the type of probe you are using
